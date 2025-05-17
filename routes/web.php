@@ -1,7 +1,20 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
+
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 Route::get('/', function () {
-    return view('welcome');
+    return Inertia::render('Home',
+        ['name' => 'Shierra']
+    );
 });
+
+Route::get('/about', function () {
+    return inertia('About/About');
+});
+
+// Route::inertia('/', 'Home');
