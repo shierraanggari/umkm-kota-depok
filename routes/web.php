@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PostController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -19,6 +20,8 @@ Route::get('/', function () {
         ['name' => 'Shierra']
     );
 });
+
+Route::resource('posts', PostController::class);
 
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
