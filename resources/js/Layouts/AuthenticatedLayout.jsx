@@ -31,8 +31,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Home
                                 </NavLink>
                                 <NavLink
-                                    href={route('profile.edit')}
-                                    active={route().current('profile.edit')}
+                                    href={route('carilapak')}
+                                    active={route().current('carilapak')}
                                 >
                                     Cari Lapak
                                 </NavLink>
@@ -145,6 +145,18 @@ export default function AuthenticatedLayout({ header, children }) {
                             active={route().current('dashboard')}
                         >
                             Dashboard
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('carilapak')}
+                            active={route().current('carilapak')}
+                        >
+                            Cari Lapak
+                        </ResponsiveNavLink>
+                        <ResponsiveNavLink
+                            href={route('profile.edit')}
+                            active={route().current('profile.edit')}
+                        >
+                            Forum Diskusi UMKM
                         </ResponsiveNavLink>
                     </div>
 
