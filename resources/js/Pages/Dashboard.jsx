@@ -19,8 +19,10 @@ export default function Dashboard() {
                             You're logged in!
                         </div>
                     </div>
-                </div>
+                </div>                
             </div>
+
+            
         </AuthenticatedLayout>
     );
 }

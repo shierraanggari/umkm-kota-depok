@@ -25,7 +25,11 @@
     },
     "dependencies": {
         "@inertiajs/react": "^2.0.10",
+        "@tabler/icons-react": "^3.33.0",
+        "clsx": "^2.1.1",
         "react": "^19.1.0",
-        "react-dom": "^19.1.0"
+        "react-dom": "^19.1.0",
+        "react-select": "^5.10.1",
+        "sweetalert2": "^11.21.2"
     }
 }

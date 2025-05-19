@@ -4,6 +4,7 @@ import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import hasAnyPermission from '@/Utils/Permission';
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
@@ -31,8 +32,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Home
                                 </NavLink>
                                 <NavLink
-                                    href={route('carilapak')}
-                                    active={route().current('carilapak')}
+                                    href={route('marketplaces')}
+                                    active={route().current('marketplaces')}
                                 >
                                     Cari Lapak
                                 </NavLink>
@@ -42,6 +43,11 @@ export default function AuthenticatedLayout({ header, children }) {
                                 >
                                     Forum Diskusi UMKM
                                 </NavLink>
+                                {hasAnyPermission(['user index']) &&
+                                    <NavLink href={route('users.index')} active={route().current('users*')}>
+                                    User
+                                    </NavLink>
+                                }
                             </div>
                         </div>
 
@@ -147,8 +153,8 @@ export default function AuthenticatedLayout({ header, children }) {
                             Dashboard
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
-                            href={route('carilapak')}
-                            active={route().current('carilapak')}
+                            href={route('marketplaces')}
+                            active={route().current('marketplaces')}
                         >
                             Cari Lapak
                         </ResponsiveNavLink>
