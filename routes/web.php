@@ -31,7 +31,7 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/marketplaces', function () {
-    return Inertia::render('Marketplaces');
+    return Inertia::render('Marketplaces/Create');
 })->middleware(['auth', 'verified'])->name('marketplaces');
 
 Route::middleware('auth')->group(function () {

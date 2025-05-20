@@ -1,7 +1,6 @@
 // import Layout from "../Layout/Layout";
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Link } from "@inertiajs/react";
-import PrimaryButton from '@/Components/PrimaryButton';
 
 const listings = [
   {
@@ -38,7 +37,7 @@ const listings = [
   },
 ];
 
-export default function Marketplaces() {
+export default function Index() {
     return (
         <AuthenticatedLayout
             header={
