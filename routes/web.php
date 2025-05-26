@@ -35,7 +35,7 @@ Route::get('/marketplaces', function () {
 })->middleware(['auth', 'verified'])->name('marketplaces');
 
 Route::get('/discussions', function () {
-    return Inertia::render('Discussions/DetailPost');
+    return Inertia::render('Discussions/Index');
 })->middleware(['auth', 'verified'])->name('discussions');
 
 Route::middleware('auth')->group(function () {

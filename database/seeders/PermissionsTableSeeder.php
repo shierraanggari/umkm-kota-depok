@@ -13,26 +13,40 @@ class PermissionsTableSeeder extends Seeder
      */
     public function run(): void
     {
-        Permission::create(['name' => 'lapak index', 'guard_name' => 'web']);
-        Permission::create(['name' => 'lapak create', 'guard_name' => 'web']);
-        Permission::create(['name' => 'lapak edit', 'guard_name' => 'web']);
-        Permission::create(['name' => 'lapak delete', 'guard_name' => 'web']);
+        $permissions = [
+        'lapak index',
+        'lapak create',
+        'lapak edit',
+        'lapak delete',
 
-        Permission::create(['name' => 'member index', 'guard_name' => 'web']);
-        Permission::create(['name' => 'member create', 'guard_name' => 'web']);
-        Permission::create(['name' => 'member edit', 'guard_name' => 'web']);
-        Permission::create(['name' => 'member delete', 'guard_name' => 'web']);
+        'member index',
+        'member create',
+        'member edit',
+        'member delete',
 
-        Permission::create(['name' => 'user index', 'guard_name' => 'web']);
-        Permission::create(['name' => 'user create', 'guard_name' => 'web']);
-        Permission::create(['name' => 'user edit', 'guard_name' => 'web']);
-        Permission::create(['name' => 'user delete', 'guard_name' => 'web']);
+        'user index',
+        'user create',
+        'user edit',
+        'user delete',
 
-        Permission::create(['name' => 'post index', 'guard_name' => 'web']);
-        Permission::create(['name' => 'post create', 'guard_name' => 'web']);
-        Permission::create(['name' => 'post edit own', 'guard_name' => 'web']);
-        Permission::create(['name' => 'post edit any', 'guard_name' => 'web']);
-        Permission::create(['name' => 'post delete own', 'guard_name' => 'web']);
-        Permission::create(['name' => 'post delete any', 'guard_name' => 'web']);
+        'post index',
+        'post create',
+        'post edit own',
+        'post edit any',
+        'post delete own',
+        'post delete any',
+
+        'community index',
+        'community create',
+        'community edit',
+        'community delete',
+    ];
+
+    foreach ($permissions as $permissionName) {
+        Permission::create([
+            'name' => $permissionName,
+            'guard_name' => 'web',
+        ]);
+    }
     }
 }
