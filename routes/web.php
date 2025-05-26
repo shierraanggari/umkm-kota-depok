@@ -34,6 +34,10 @@ Route::get('/marketplaces', function () {
     return Inertia::render('Marketplaces/Create');
 })->middleware(['auth', 'verified'])->name('marketplaces');
 
+Route::get('/discussions', function () {
+    return Inertia::render('Discussions/DetailPost');
+})->middleware(['auth', 'verified'])->name('discussions');
+
 Route::middleware('auth')->group(function () {
     // permissions route
     Route::resource('/permissions', PermissionController::class);

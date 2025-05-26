@@ -1,6 +1,7 @@
 // import Layout from "../Layout/Layout";
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Link } from "@inertiajs/react";
+import { Button } from '@/Components/ui/button';
 
 const listings = [
   {
@@ -46,59 +47,61 @@ export default function Index() {
                 </h2>
             }
         >
-            <div className="border border-black rounded p-6 m-5">
-                <h2 className="text-xl font-semibold mb-4">Search Filters</h2>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                <input type="text" placeholder="Search listings..." className="p-2 rounded bg-white border border-gray-600 placeholder-gray-400" />
-                <select className="p-2 rounded bg-white border border-gray-600">
-                    <option>Depok Dua</option>
-                    <option>Depok Timur</option>
-                    <option>Margonda</option>
-                </select>
-                <select className="p-2 rounded bg-white border border-gray-600">
-                    <option>Ruko</option>
-                    <option>Kios</option>
-                    <option>Tenda</option>
-                </select>
-                <select className="p-2 rounded bg-white border border-gray-600">
-                    <option>Any price</option>
-                    <option>Any price</option>
-                    <option>Any price</option>
-                </select>
-                </div>
-                <button className="border border-black bg-white text-black px-2 py-2 rounded hover:bg-slate-500 hover:text-white hover:border-white transition"> 
-                    Apply Filters 
-                </button>
-            </div>            
+            <div className="mx-2 space-y-6 mt-6">
+                <div className="border border-black rounded p-6">
+                    <h2 className="text-xl font-semibold mb-4">Search Filters</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                    <input type="text" placeholder="Search listings..." className="p-2 rounded bg-white border border-gray-600 placeholder-gray-400" />
+                    <select className="p-2 rounded bg-white border border-gray-600">
+                        <option>Depok Dua</option>
+                        <option>Depok Timur</option>
+                        <option>Margonda</option>
+                    </select>
+                    <select className="p-2 rounded bg-white border border-gray-600">
+                        <option>Ruko</option>
+                        <option>Kios</option>
+                        <option>Tenda</option>
+                    </select>
+                    <select className="p-2 rounded bg-white border border-gray-600">
+                        <option>Any price</option>
+                        <option>Any price</option>
+                        <option>Any price</option>
+                    </select>
+                    </div>
+                    <Button> 
+                        Apply Filters 
+                    </Button>
+                </div>            
 
-            <div className="m-5 flex flex-row justify-between items-center gap-3">
-                <h2 className="text-xl font-semibold leading-tight text-gray-800"> Pilih lapakmu </h2>
-                <button className="border border-black bg-white text-black px-2 py-2 rounded hover:bg-slate-500 hover:text-white hover:border-white transition">
-                    Tambah Lapak
-                </button>
-            </div>
-
-            <div className="grid grid-cols-1 m-5 md:grid-cols-3 gap-6">
-                {listings.map((item, index) => (
-                <div key={index} className="bg-white/10 border border-gray-700 rounded-lg overflow-hidden">
-                    <div className="h-40 bg-gray-800 flex items-center justify-center">
-                    <span className="text-gray-500">[ Image Placeholder ]</span>
-                    </div>
-                    <div className="p-4">
-                    <div className="flex justify-between items-center font-semibold">
-                        <h3>{item.title}</h3>
-                        <span>{item.price}</span>
-                    </div>
-                    <p className="text-sm text-gray-400 mb-2">{item.location}</p>
-                    <p className="text-sm mb-4">{item.description}</p>
-                    <div className="flex justify-between text-sm text-gray-300 mb-4">
-                        <span>📦 {item.type}</span>
-                        <span>📐 {item.size}</span>
-                    </div>
-                    <button className="border border-black bg-white text-black w-full py-2 rounded self-end hover:bg-slate-500 hover:text-white hover:border-white transition">View Details</button>
-                    </div>
+                <div className="flex flex-row justify-between items-center gap-3">
+                    <h2 className="text-xl font-semibold leading-tight text-gray-800"> Pilih lapakmu </h2>
+                    <Button> 
+                        Tambah Lapak 
+                    </Button>
                 </div>
-                ))}
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {listings.map((item, index) => (
+                    <div key={index} className="bg-white/10 border border-gray-700 rounded-lg overflow-hidden">
+                        <div className="h-40 bg-gray-800 flex items-center justify-center">
+                        <span className="text-gray-500">[ Image Placeholder ]</span>
+                        </div>
+                        <div className="p-4">
+                        <div className="flex justify-between items-center font-semibold">
+                            <h3>{item.title}</h3>
+                            <span>{item.price}</span>
+                        </div>
+                        <p className="text-sm text-gray-400 mb-2">{item.location}</p>
+                        <p className="text-sm mb-4">{item.description}</p>
+                        <div className="flex justify-between text-sm text-gray-300 mb-4">
+                            <span>📦 {item.type}</span>
+                            <span>📐 {item.size}</span>
+                        </div>
+                        <button className="border border-black bg-white text-black w-full py-2 rounded self-end hover:bg-slate-500 hover:text-white hover:border-white transition">View Details</button>
+                        </div>
+                    </div>
+                    ))}
+                </div>
             </div>
                 <Link preserveScroll href="/carilapak" className="block title mt-[1000px]">
                     {new Date().toLocaleTimeString()}

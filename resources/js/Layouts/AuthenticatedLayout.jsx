@@ -38,8 +38,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Cari Lapak
                                 </NavLink>
                                 <NavLink
-                                    href={route('profile.edit')}
-                                    active={route().current('profile.edit')}
+                                    href={route('discussions')}
+                                    active={route().current('discussions')}
                                 >
                                     Forum Diskusi UMKM
                                 </NavLink>
@@ -159,8 +159,8 @@ export default function AuthenticatedLayout({ header, children }) {
                             Cari Lapak
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
-                            href={route('profile.edit')}
-                            active={route().current('profile.edit')}
+                            href={route('discussions')}
+                            active={route().current('discussions')}
                         >
                             Forum Diskusi UMKM
                         </ResponsiveNavLink>
