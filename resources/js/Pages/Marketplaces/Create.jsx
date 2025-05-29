@@ -1,115 +1,316 @@
-export default function CreatePostPage() {
-  return (
-    <div className="max-w-4xl mx-auto p-6">
-        <div className="bg-white shadow-md rounded-lg p-6 border border-black">
-            <h2 className="text-2xl font-bold mb-1">Buat Post Lapak Usaha</h2>
-            <p className="text-gray-500 mb-6">Isi informasi lengkap tentang lapak usaha yang ingin kamu posting</p>
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import { Button } from "@/Components/ui/button";
+import { useForm } from "@inertiajs/react";
+import { useState } from "react";
 
-            <div className="space-y-4">
-            {/* Nama Lapak */}
-            <div>
-                <label className="block font-medium mb-1">Nama Lapak</label>
-                <input type="text" placeholder="Masukkan nama lapak usaha" className="w-full border rounded px-3 py-2" />
-            </div>
+export default function Create({ types, kelurahans, kecamatans }) {
+    const { data, setData, post, processing, errors } = useForm({
+        name: '',
+        type: '',
+        description: '',
+        size: '',
+        price: '',
+        price_type: 'monthly',
+        kecamatan: '',
+        kelurahan: '',
+        address: '',
+        long: '',
+        lat: '',
+    })
 
-            {/* Jenis Lapak */}
-            <div>
-                <label className="block font-medium mb-1">Jenis Lapak</label>
-                <select className="w-full border rounded px-3 py-2">
-                <option value="">Pilih jenis lapak</option>
-                <option value="kios">Kios</option>
-                <option value="ruko">Ruko</option>
-                <option value="toko">Toko</option>
-                <option value="stan">Stan Pasar</option>
-                <option value="booth">Booth</option>
-                <option value="other">Lainnya</option>
-                </select>
-            </div>
+    const handleKecamatanChange = (e) => {
+        setData({
+            ...data,
+            kecamatan: e.target.value,
+            kelurahan: '',
+        });
+    };
 
-            {/* Deskripsi */}
-            <div>
-                <label className="block font-medium mb-1">Deskripsi</label>
-                <textarea placeholder="Deskripsikan lapak usaha kamu secara detail" className="w-full border rounded px-3 py-2 min-h-[120px]" />
-            </div>
+    const submit = (e) => {
+        e.preventDefault();
 
-            {/* Ukuran */}
-            <div>
-                <label className="block font-medium mb-1">Ukuran Lapak</label>
-                <input type="text" placeholder="Contoh: 3x4 meter" className="w-full border rounded px-3 py-2" />
-            </div>
+        post(route('marketplace.store'));
+    };
 
-            {/* Harga */}
-            <div>
-                <label className="block font-medium mb-1">Harga</label>
-                <div className="flex gap-4">
-                <input type="number" placeholder="Masukkan harga" className="w-full border rounded px-3 py-2" />
-                <div className="flex items-center gap-2">
-                    <input type="radio" name="priceType" value="month" defaultChecked />
-                    <label>Per Bulan</label>
-                </div>
-                <div className="flex items-center gap-2">
-                    <input type="radio" name="priceType" value="year" />
-                    <label>Per Tahun</label>
-                </div>
-                </div>
-            </div>
+    const [locationError, setLocationError] = useState(null);
 
-            {/* Kecamatan dan Kelurahan */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                <label className="block font-medium mb-1">Kecamatan</label>
-                <input type="text" placeholder="Masukkan kecamatan" className="w-full border rounded px-3 py-2" />
-                </div>
-                <div>
-                <label className="block font-medium mb-1">Kelurahan</label>
-                <input type="text" placeholder="Masukkan kelurahan" className="w-full border rounded px-3 py-2" />
-                </div>
-            </div>
+    const handleGetLocation = () => {
+        if (navigator.geolocation) {
+            setLocationError(null);
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    setData({
+                        ...data,
+                        lat: position.coords.latitude,
+                        long: position.coords.longitude,
+                    });
+                },
+                (error) => {
+                    console.warn('Geolocation error:', error.message);
+                    setLocationError('Gagal mendapatkan lokasi. Izinkan akses lokasi atau masukkan manual.');
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        } else {
+            setLocationError('Geolocation tidak didukung browser ini.');
+        }
+    };
 
-            {/* Alamat */}
-            <div>
-                <label className="block font-medium mb-1">Alamat Lengkap</label>
-                <textarea placeholder="Masukkan alamat lengkap lapak" className="w-full border rounded px-3 py-2" />
-            </div>
+    const availableKelurahans = kelurahans[data.kecamatan] || [];
 
-            {/* Lokasi Peta */}
-            <div>
-                <label className="block font-medium mb-1">Lokasi di Peta</label>
-                <div className="border rounded-md p-4 bg-gray-100 h-[200px] flex items-center justify-center">
-                <div className="text-center text-gray-500">
-                    <div className="text-2xl mb-1">📍</div>
-                    Klik untuk memilih lokasi di peta
-                </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4 mt-2">
-                <div>
-                    <label className="block text-sm font-medium mb-1">Latitude</label>
-                    <input type="text" placeholder="Latitude" className="w-full border rounded px-3 py-2" readOnly />
-                </div>
-                <div>
-                    <label className="block text-sm font-medium mb-1">Longitude</label>
-                    <input type="text" placeholder="Longitude" className="w-full border rounded px-3 py-2" readOnly />
-                </div>
-                </div>
-            </div>
+    const mapUrl = data.lat && data.long
+        ? `https://staticmap.openstreetmap.de/staticmap.php?center=${data.lat},${data.long}&zoom=15&size=400x200&maptype=osm`
+        : null;
 
-            {/* Upload Foto */}
-            <div>
-                <label className="block font-medium mb-1">Foto Lapak</label>
-                <div className="border-2 border-dashed rounded-md p-6 text-center">
-                <p className="text-gray-500 mb-2">Drag & drop foto lapak atau</p>
-                <button className="border rounded px-4 py-2 text-sm">Pilih File</button>
+    return (
+        <AuthenticatedLayout
+            header={
+                <h2 className="text-xl font-semibold leading-tight text-gray-800">
+                    Tambah Lapak
+                </h2>
+            }
+        >
+            <div className="max-w-4xl mx-auto p-6">
+                <div className="bg-white shadow-md rounded-lg p-6 border border-black">
+                    <h2 className="text-2xl font-bold mb-1">Buat Post Lapak Usaha</h2>
+                    <p className="text-gray-500 mb-6">Isi informasi lengkap tentang lapak usaha yang ingin kamu posting</p>
+
+                    <form onSubmit={submit} className="space-y-4">
+                        {/* Nama Lapak */}
+                        <div>
+                            <label className="block font-medium mb-1">Nama Lapak</label>
+                            <input 
+                                type="text" 
+                                value={data.name}
+                                onChange={(e) => setData('name', e.target.value)}
+                                placeholder="Masukkan nama lapak usaha" 
+                                className="w-full border rounded px-3 py-2" 
+                            />
+                            {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
+                        </div>
+
+                        {/* Jenis Lapak */}
+                        <div>
+                            <label className="block font-medium mb-1">Jenis Lapak</label>
+                            <select 
+                                value={data.type}
+                                onChange={(e) => setData('type', e.target.value)}
+                                className="w-full text-sm border rounded px-3 py-2"
+                            >
+                                <option value="">Pilih jenis lapak</option>
+                                {types.map(({ value, label }) => (
+                                    <option
+                                        key={value}
+                                        value={value}
+                                    >
+                                        {label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        {/* Deskripsi */}
+                        <div>
+                            <label className="block font-medium mb-1">Deskripsi</label>
+                            <textarea 
+                                type="text" 
+                                value={data.description}
+                                onChange={(e) => setData('description', e.target.value)}
+                                placeholder="Deskripsikan lapak usaha kamu secara detail" 
+                                className="w-full text-sm border rounded px-3 py-2 min-h-[120px]"
+                            />
+                        </div>
+
+                        {/* Ukuran */}
+                        <div>
+                            <label className="block font-medium mb-1">Ukuran Lapak</label>
+                            <div className="flex flex-row gap-2">
+                                <input 
+                                    type="number"
+                                    step="0.1"
+                                    value={data.size_length}
+                                    onChange={e => setData('size_length', e.target.value)}
+                                    placeholder="Panjang"
+                                    className="w-full border rounded px-3 py-2 text-sm"
+                                />
+                                <span className="text-sm self-center">
+                                    meter
+                                </span>
+                                <input 
+                                    type="number"
+                                    step="0.1"
+                                    value={data.size_width}
+                                    onChange={e => setData('size_width', e.target.value)}
+                                    placeholder="Lebar"
+                                    className="w-full border rounded px-3 py-2 text-sm ml-2"
+                                />
+                                <span className="text-sm self-center">
+                                    meter
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Harga */}
+                        <div>
+                            <label className="block font-medium mb-1">Harga</label>
+                            <div className="flex gap-4">
+                                <input 
+                                    type="number"
+                                    value={data.price}
+                                    onChange={e => setData('price', e.target.value)}
+                                    placeholder="Masukkan harga"
+                                    className="w-full border rounded px-3 text-sm" 
+                                />
+                                <div className="flex items-center gap-2">
+                                    <input 
+                                        type="radio" 
+                                        name="priceType" 
+                                        value="monthly"
+                                        checked={data.price_type === 'monthly'}
+                                        onChange={(e) => setData('price_type', e.target.value)}
+                                    />
+                                    <label>Per Bulan</label>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <input 
+                                        type="radio" 
+                                        name="priceType" 
+                                        value="yearly"
+                                        checked={data.price_type === 'yearly'}
+                                        onChange={(e) => setData('price_type', e.target.value)}
+                                    />
+                                    <label>Per Tahun</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Kecamatan dan Kelurahan */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label className="block font-medium mb-1">Kecamatan</label>
+                                <select 
+                                    value={data.kecamatan}
+                                    // onChange={(e) => setData('kecamatan', e.target.value)}
+                                    onChange={handleKecamatanChange}
+                                    className="w-full text-sm border rounded px-3 py-2"
+                                >
+                                    <option value="">Pilih kecamatan</option>
+                                    {kecamatans.map(({ value, label }) => (
+                                        <option
+                                            key={value}
+                                            value={value}
+                                        >
+                                            {label}
+                                        </option>
+                                    ))}
+                                </select>
+                                {errors.kecamatan && <p className="text-red-500 text-sm">{errors.kecamatan}</p>}
+                            </div>
+                            <div>
+                                <label className="block font-medium mb-1">Kelurahan</label>
+                                <select 
+                                    value={data.kelurahan}
+                                    onChange={(e) => setData('kelurahan', e.target.value)}
+                                    className="w-full text-sm border rounded px-3 py-2"
+                                    disabled={!data.kecamatan}
+                                >
+                                    <option value="">Pilih kelurahan</option>
+                                    {availableKelurahans.map(({ value, label }) => (
+                                        <option
+                                            key={value}
+                                            value={value}
+                                        >
+                                            {label}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Alamat */}
+                        <div>
+                            <label className="block font-medium mb-1">Alamat Lengkap</label>
+                            <textarea 
+                                type="text" 
+                                value={data.address}
+                                onChange={(e) => setData('address', e.target.value)}
+                                placeholder="Masukkan alamat lengkap lapak" 
+                                className="w-full text-sm border rounded px-3 py-2" 
+                            />
+                        </div>
+
+                        {/* Lokasi Peta */}
+                        <div>
+                            <label className="block font-medium mb-1">Lokasi di Peta</label>
+                            <div className="border rounded-md p-2 bg-gray-100 flex flex-col items-center justify-center">
+                                {data.lat && data.long && (
+                                <iframe
+                                    loading="lazy"
+                                    allowFullScreen
+                                    className="flex w-full h-full"
+                                    src={`https://www.openstreetmap.org/export/embed.html?bbox=${data.long},${data.lat},${data.long},${data.lat}&layer=mapnik&marker=${data.lat},${data.long}`}
+                                ></iframe>
+                                )}
+                                <div className="text-center text-gray-500 my-2">
+                                    Klik tombol untuk ambil lokasi otomatis
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={handleGetLocation}
+                                    className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition text-sm"
+                                >
+                                    Masukkan Lokasi
+                                </button>
+                                {locationError && <p className="text-red-500 text-sm mt-2">{locationError}</p>}
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 mt-2">
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Latitude</label>
+                                    <input 
+                                        type="text" 
+                                        value={data.lat}
+                                        onChange={(e) => setData('lat', e.target.value)}
+                                        placeholder="Latitude" 
+                                        className="w-full border rounded px-3 py-2"
+                                    />
+                                    {errors.lat && <p className="text-red-500 text-sm">{errors.lat}</p>}
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Longitude</label>
+                                    <input 
+                                        type="text" 
+                                        value={data.long}
+                                        onChange={(e) => setData('long', e.target.value)}
+                                        placeholder="Longitude" 
+                                        className="w-full border rounded px-3 py-2"
+                                    />
+                                    {errors.long && <p className="text-red-500 text-sm">{errors.long}</p>}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Upload Foto */}
+                        <div>
+                            <label className="block font-medium mb-1">Foto Lapak</label>
+                            <div className="border-2 border-dashed rounded-md p-6 text-center">
+                            <p className="text-gray-500 mb-2">Drag & drop foto lapak atau</p>
+                            <button className="border rounded px-4 py-2 text-sm">Pilih File</button>
+                            </div>
+                        </div>
+
+                        {/* Submit */}
+                        <div>
+                            <Button 
+                                type="submit"
+                                disabled={processing}
+                                className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+                            >
+                            Buat Post Lapak
+                            </Button>
+                        </div>
+                    </form>
                 </div>
             </div>
-
-            {/* Submit */}
-            <div>
-                <button className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">
-                Buat Post Lapak
-                </button>
-            </div>
-            </div>
-        </div>
-    </div>
-  )
+        </AuthenticatedLayout>
+    )
 }

@@ -1,4 +1,7 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import { Button } from '@/Components/ui/button';
+import { usePage } from '@inertiajs/react';
+import hasAnyPermission from '@/Utils/Permission';
 
 export default function Index() {
     const communities = [
@@ -39,6 +42,8 @@ export default function Index() {
             members: 789
         },
     ];
+
+    const { permission } = usePage().props;
     
     return (
         <AuthenticatedLayout
@@ -75,9 +80,11 @@ export default function Index() {
                 </div>
 
                 <div className="flex justify-end my-4">
-                    <button className="border border-black bg-white text-black px-2 py-2 rounded hover:bg-slate-500 hover:text-white hover:border-white transition"> 
-                        Buat Komunitas
-                    </button>
+                    {hasAnyPermission(['community create'], permission) && (
+                        <button className="border border-black bg-white text-black px-2 py-2 rounded hover:bg-slate-500 hover:text-white hover:border-white transition"> 
+                            Buat Komunitas
+                        </button>
+                    )}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {communities.map((community, idx) => (

@@ -11,6 +11,9 @@ export default function AuthenticatedLayout({ header, children }) {
 
     const [showingNavigationDropdown, setShowingNavigationDropdown] =
         useState(false);
+    
+    const { props } = usePage();
+    const successMessage = props.flash?.success;
 
     return (
         <div className="min-h-screen bg-gray-100">
@@ -32,8 +35,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                     Home
                                 </NavLink>
                                 <NavLink
-                                    href={route('marketplaces')}
-                                    active={route().current('marketplaces')}
+                                    href={route('marketplace.index')}
+                                    active={route().current('marketplace*')}
                                 >
                                     Cari Lapak
                                 </NavLink>
@@ -153,8 +156,8 @@ export default function AuthenticatedLayout({ header, children }) {
                             Dashboard
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
-                            href={route('marketplaces')}
-                            active={route().current('marketplaces')}
+                            href={route('marketplace.index')}
+                            active={route().current('marketplace.index')}
                         >
                             Cari Lapak
                         </ResponsiveNavLink>
@@ -198,6 +201,12 @@ export default function AuthenticatedLayout({ header, children }) {
                         {header}
                     </div>
                 </header>
+            )}
+
+            {successMessage && (
+                <div className="bg-green-100 text-green-800 p-3 rounded mx-2 mt-4 border border-green-300">
+                    {successMessage}
+                </div>
             )}
 
             <main>{children}</main>

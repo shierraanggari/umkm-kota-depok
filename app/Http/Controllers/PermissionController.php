@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Spatie\Permission\Models\Permission;
+use Illuminate\Http\Request;
 
 class PermissionController extends Controller implements HasMiddleware
 {

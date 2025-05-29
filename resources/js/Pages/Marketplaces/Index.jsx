@@ -2,6 +2,11 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Link } from "@inertiajs/react";
 import { Button } from '@/Components/ui/button';
+import {
+  MapPin,
+  Factory,
+  Ruler
+} from 'lucide-react'
 
 const listings = [
   {
@@ -38,7 +43,7 @@ const listings = [
   },
 ];
 
-export default function Index() {
+export default function Index({ marketplaces }) {
     return (
         <AuthenticatedLayout
             header={
@@ -75,29 +80,38 @@ export default function Index() {
 
                 <div className="flex flex-row justify-between items-center gap-3">
                     <h2 className="text-xl font-semibold leading-tight text-gray-800"> Pilih lapakmu </h2>
-                    <Button> 
-                        Tambah Lapak 
-                    </Button>
+                    <Link href={route('marketplace.create')}>
+                        <Button> 
+                            Tambah Lapak 
+                        </Button>
+                    </Link>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {listings.map((item, index) => (
-                    <div key={index} className="bg-white/10 border border-gray-700 rounded-lg overflow-hidden">
+                    {marketplaces.map((item, index) => (
+                    <div key={index} className="bg-white/10 border border-gray-700 rounded-lg">
                         <div className="h-40 bg-gray-800 flex items-center justify-center">
-                        <span className="text-gray-500">[ Image Placeholder ]</span>
+                            <span className="text-gray-500">[ Image Placeholder ]</span>
                         </div>
-                        <div className="p-4">
-                        <div className="flex justify-between items-center font-semibold">
-                            <h3>{item.title}</h3>
-                            <span>{item.price}</span>
-                        </div>
-                        <p className="text-sm text-gray-400 mb-2">{item.location}</p>
-                        <p className="text-sm mb-4">{item.description}</p>
-                        <div className="flex justify-between text-sm text-gray-300 mb-4">
-                            <span>📦 {item.type}</span>
-                            <span>📐 {item.size}</span>
-                        </div>
-                        <button className="border border-black bg-white text-black w-full py-2 rounded self-end hover:bg-slate-500 hover:text-white hover:border-white transition">View Details</button>
+                        <div className="p-4 space-y-2">
+                            <p className="font-medium text-md">{item.name}</p>
+                            <p className="font-bold text-xl">
+                                {new Intl.NumberFormat('id-ID', {
+                                    style: 'currency',
+                                    currency: 'IDR',
+                                    minimumFractionDigits: 2,
+                                }).format(item.price)}
+                                {item.price_type === 'monthly' ? '/bulan' : '/tahun'}
+                            </p>
+                            <p className="text-sm text-gray-400 mb-2">{item.location}</p>
+                            <p className="flex text-sm mb-4">
+                                <MapPin className="w-5 h-5 mr-1"/>{item.kelurahan}, {item.kecamatan}
+                            </p>
+                            <div className="flex justify-between text-sm font-medium text-gray-700 mb-4">
+                                <span className="flex"><Factory className="w-5 h-5 mr-1"/>{item.type}</span>
+                                <span className="flex"><Ruler className="w-5 h-5 mr-1"/>{+item.size_length} x {+item.size_width} meter</span>
+                            </div>
+                            <button className="border border-black bg-white text-black w-full py-2 rounded self-end hover:bg-slate-500 hover:text-white hover:border-white transition">View Details</button>
                         </div>
                     </div>
                     ))}
@@ -109,21 +123,3 @@ export default function Index() {
         </AuthenticatedLayout>
     )
 }
-
-// function CariLapak({name}) {
-//     return (
-//         <>
-//             <h1 className="title"> 
-//                 Hello, {name}
-//             </h1>
-
-//             <Link preserveScroll href="/" className="block title mt-[1000px]">
-//                 {new Date().toLocaleTimeString()}
-//             </Link>
-//         </>
-//     )
-// }
-
-// CariLapak.layout = page => <Layout children={page}/>
-
-// export default CariLapak;

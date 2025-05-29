@@ -5,6 +5,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\MarketplaceController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -18,33 +19,32 @@ Route::get('/', function () {
     ]);
 });
 
-// Route::get('/', function () {
-//     return Inertia::render('Home',
-//         ['name' => 'Shierra']
-//     );
-// });
-
-Route::resource('posts', PostController::class);
-
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/marketplaces', function () {
-    return Inertia::render('Marketplaces/Create');
-})->middleware(['auth', 'verified'])->name('marketplaces');
+// Route::resource('/marketplace', MarketplaceController::class)
+//     ->only(['index', 'show']);
+
+// Route::middleware(['auth'])->group(function () {
+//     Route::resource('/marketplace', MarketplaceController::class)
+//         ->except(['index', 'show']);
+// });
 
 Route::get('/discussions', function () {
-    return Inertia::render('Discussions/Index');
+    return Inertia::render('Discussions/CreateCommunity');
 })->middleware(['auth', 'verified'])->name('discussions');
 
 Route::middleware('auth')->group(function () {
-    // permissions route
     Route::resource('/permissions', PermissionController::class);
-    // roles route
+
+    Route::resource('/marketplace', MarketplaceController::class);
+    
     Route::resource('roles', RoleController::class)->except('show');
-    // users route
+    
     Route::resource('/users', UserController::class);
+
+    // Route::get('/marketplace', [MarketplaceController::class, 'index'])->name('marketplace.index');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

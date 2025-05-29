@@ -16,7 +16,8 @@ return new class extends Migration
             $table->string('name');
             $table->string('type')->nullable();
             $table->text('description')->nullable();
-            $table->string('size')->nullable();
+            $table->decimal('size_length', 8, 2)->nullable();
+            $table->decimal('size_width', 8, 2)->nullable();
             $table->decimal('price', 10, 2)->nullable(); // price DECIMAL(10,2)
             $table->enum('price_type', ['yearly', 'monthly'])->default('monthly');
             $table->string('kecamatan')->nullable();
