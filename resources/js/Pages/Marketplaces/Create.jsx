@@ -8,7 +8,8 @@ export default function Create({ types, kelurahans, kecamatans }) {
         name: '',
         type: '',
         description: '',
-        size: '',
+        size_length: '',
+        size_width: '',
         price: '',
         price_type: 'monthly',
         kecamatan: '',
@@ -16,7 +17,16 @@ export default function Create({ types, kelurahans, kecamatans }) {
         address: '',
         long: '',
         lat: '',
+        photos: [],
     })
+
+    const submit = (e) => {
+        e.preventDefault();
+
+        post(route('marketplace.store'), {
+            forceFormData: true,
+        });
+    };
 
     const handleKecamatanChange = (e) => {
         setData({
@@ -24,12 +34,6 @@ export default function Create({ types, kelurahans, kecamatans }) {
             kecamatan: e.target.value,
             kelurahan: '',
         });
-    };
-
-    const submit = (e) => {
-        e.preventDefault();
-
-        post(route('marketplace.store'));
     };
 
     const [locationError, setLocationError] = useState(null);
@@ -58,9 +62,25 @@ export default function Create({ types, kelurahans, kecamatans }) {
 
     const availableKelurahans = kelurahans[data.kecamatan] || [];
 
-    const mapUrl = data.lat && data.long
-        ? `https://staticmap.openstreetmap.de/staticmap.php?center=${data.lat},${data.long}&zoom=15&size=400x200&maptype=osm`
-        : null;
+    const handleMultipleFiles = (e) => {
+        const newFiles = Array.from(e.target.files);
+        const validFiles = newFiles.filter(f => 
+            ['image/jpeg', 'image/png', 'image/jpg', 'image/heif'].includes(f.type)
+        );
+        if (newFiles.length !== validFiles.length) {
+            alert('Masukkan file dengan format JPG, JPEG, PNG, atau HEIF.');
+        }
+        const totalFiles = data.photos.length + validFiles.length;
+        if (totalFiles > 5) {
+            alert('Maksimal upload 5 foto.');
+            return;
+        }
+        setData('photos', [...data.photos, ...validFiles]);
+    };
+
+    const handleFileRemove = (index) => {
+        setData('photos', data.photos.filter((_, i) => i !== index));
+    };
 
     return (
         <AuthenticatedLayout
@@ -75,7 +95,7 @@ export default function Create({ types, kelurahans, kecamatans }) {
                     <h2 className="text-2xl font-bold mb-1">Buat Post Lapak Usaha</h2>
                     <p className="text-gray-500 mb-6">Isi informasi lengkap tentang lapak usaha yang ingin kamu posting</p>
 
-                    <form onSubmit={submit} className="space-y-4">
+                    <form onSubmit={submit} className="space-y-4" encType="multipart/form-data">
                         {/* Nama Lapak */}
                         <div>
                             <label className="block font-medium mb-1">Nama Lapak</label>
@@ -291,11 +311,55 @@ export default function Create({ types, kelurahans, kecamatans }) {
 
                         {/* Upload Foto */}
                         <div>
-                            <label className="block font-medium mb-1">Foto Lapak</label>
-                            <div className="border-2 border-dashed rounded-md p-6 text-center">
-                            <p className="text-gray-500 mb-2">Drag & drop foto lapak atau</p>
-                            <button className="border rounded px-4 py-2 text-sm">Pilih File</button>
-                            </div>
+                            <label htmlFor="photos" className="block mb-1 font-medium">Foto Lapak (Opsional, Maksimal 5 Foto)</label>
+                            <input
+                                id="photos"
+                                type="file"
+                                multiple
+                                onChange={handleMultipleFiles}
+                                accept="image/jpeg,image/png,image/jpg,image/heif,image/webp" // Tambah webp
+                                className="w-full p-6 text-sm border-2 border-dashed rounded-md disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                disabled={data.photos.length >= 5} // Disable jika sudah 5 foto
+                            />
+                            {data.photos.length >= 5 && (
+                                <p className="mt-1 text-sm text-yellow-600">Anda sudah mencapai batas maksimal 5 foto.</p>
+                            )}
+                            {/* Menampilkan error umum untuk field photos (misal dari validasi backend) */}
+                            {errors.photos && typeof errors.photos === 'string' && (
+                                <span className="text-sm text-red-500">{errors.photos}</span>
+                            )}
+                            {/* Menampilkan error spesifik per file jika ada (misal: photos.0 tidak valid) */}
+                            {typeof errors === 'object' && Object.keys(errors).some(key => key.startsWith('photos.')) && (
+                                 <span className="text-sm text-red-500">Terdapat masalah dengan salah satu atau lebih file foto yang diupload. Pastikan format dan ukuran sesuai.</span>
+                            )}
+
+
+                            {data.photos.length > 0 && (
+                                <div className="mt-4">
+                                    <p className="mb-2 text-sm font-semibold">Preview foto yang dipilih ({data.photos.length}/5):</p>
+                                    <div className="flex flex-wrap gap-3">
+                                        {data.photos.map((file, index) => (
+                                            <div key={index} className="relative group">
+                                                <img
+                                                    src={URL.createObjectURL(file)}
+                                                    alt={`Preview ${file.name}`}
+                                                    className="object-cover rounded-md w-28 h-28"
+                                                    onLoad={() => URL.revokeObjectURL(file.previewUrl)} // Bersihkan memory
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    onClick={() => handleFileRemove(index)}
+                                                    variant="destructive" // Jika Button component Anda punya variant
+                                                    className="absolute top-1 right-1 flex items-center justify-center w-6 h-6 p-0 text-xs text-white bg-red-500 rounded-full opacity-75 group-hover:opacity-100 hover:bg-red-700"
+                                                    title="Hapus foto ini"
+                                                >
+                                                    X
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Submit */}

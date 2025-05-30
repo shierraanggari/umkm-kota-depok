@@ -5,10 +5,26 @@ import {
   Phone,
   User,
   Info,
-  Star
+  ImageOff,
+  Ruler,
+  Calendar,
+  Factory,
+  MapPinned,
+  Globe
 } from 'lucide-react'
+import { useState, useEffect } from 'react';
+import { Link } from '@inertiajs/react';
 
-export default function Show({ marketplace }) {
+const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return new Intl.DateTimeFormat('id-ID', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+    }).format(date);
+};
+
+export default function Show({ marketplace, photos, auth }) {
   const listing = {
     title: "Modern Kiosk in Shopping Mall",
     location: "Central Mall, Jakarta",
@@ -34,29 +50,74 @@ export default function Show({ marketplace }) {
     }
   }
 
+  const [selectedImage, setSelectedImage] = useState('');
+
+  const placeholderPhoneNumber = "+62 800-0000-0000";
+
+  const hasValidLocation = marketplace.lat && marketplace.long &&
+                          isFinite(parseFloat(marketplace.lat)) &&
+                          isFinite(parseFloat(marketplace.long));
+
+  useEffect(() => {
+      if (photos && photos.length > 0) {
+          setSelectedImage(photos[0].url);
+      } else {
+          setSelectedImage('');
+      }
+  }, [photos]);
+
   return (
     <AuthenticatedLayout>
       <div className="max-w-5xl mx-auto px-6 py-8">
-        {/* Back Button */}
-        <button
-          onClick={() => router.go(-1)}
-          className="flex items-center text-sm text-gray-500 hover:text-blue-600 transition-colors mb-6"
+        
+        <Link
+            href={route('marketplace.index')}
+            className="flex items-center mb-6 text-sm text-gray-500 transition-colors hover:text-blue-600"
         >
-          <ArrowLeft className="w-4 h-4 mr-1" />
-          Kembali
-        </button>
+            <ArrowLeft className="w-4 h-4 mr-1" />
+            Kembali ke Daftar Lapak
+        </Link>
 
         <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8">
           <div className="md:col-span-2 space-y-4">
-          {/* image */}
-            <div className="bg-gray-100">
-              <img
-                src={listing.images[0]}
-                alt="Kiosk"
-                className="w-full max-h-96 object-cover rounded-xl"
-              />
-            </div>
-          {/* image */}
+          
+            <div className="p-4 space-y-3 bg-white border border-gray-200 rounded-xl shadow-sm">
+              <div className="flex items-center justify-center w-full overflow-hidden bg-gray-100 rounded-lg aspect-video">
+                  {selectedImage ? (
+                      <img
+                          src={selectedImage}
+                          alt="Gambar Utama Lapak"
+                          className="object-contain w-full h-full max-h-[500px]"
+                      />
+                  ) : (
+                      <div className="flex flex-col items-center justify-center w-full h-full text-gray-400">
+                          <ImageOff size={64} />
+                          <p className="mt-2">Tidak ada gambar</p>
+                      </div>
+                  )}
+              </div>
+              
+              {photos && photos.length > 1 && (
+                  <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6">
+                      {photos.map((photo) => (
+                          <button
+                              key={photo.id}
+                              onClick={() => setSelectedImage(photo.url)}
+                              className={`overflow-hidden rounded-md aspect-square focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
+                                  ${selectedImage === photo.url ? 'ring-2 ring-blue-600 ring-offset-1' : 'hover:opacity-80'}`}
+                          >
+                              <img
+                                  src={photo.url}
+                                  alt={`Thumbnail ${photo.id}`}
+                                  className="object-cover w-full h-full"
+                              />
+                          </button>
+                      ))}
+                  </div>
+              )}
+          </div>
+
+          {/* Nama dan Kel Kec */}
             <div>
               <h1 className="text-2xl font-semibold"> {marketplace.name} </h1>
               <div className="flex items-center text-gray-500 text-md font-regular mt-1">
@@ -68,29 +129,27 @@ export default function Show({ marketplace }) {
             </div>
           </div>
 
-          {/* detail */}
+          {/* Detail */}
           <div className="space-y-6">
             <div className="bg-white text-black rounded-xl p-6 shadow-sm">
-              <div className="text-3xl font-bold mb-2">Rp 5.000.000</div>
-              <div className="text-sm text-gray-500 mb-4">per bulan</div>
+              <div className="text-3xl font-bold mb-2">{marketplace.price}</div>
+              <div className="text-sm text-gray-500 mb-4">{marketplace.price_type === 'monthly' ? 'per bulan' : 'per tahun'}</div>
               <div className="space-y-2 text-sm text-gray-700">
                 <div className="flex items-center">
-                  <svg className="w-4 h-4 mr-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-                  </svg>
-                  Tipe: <span className="ml-auto font-medium">Kiosk</span>
+                  <Factory className="w-4 h-4 stroke-1 mr-2"/>
+                  Tipe: <span className="ml-auto font-medium">{marketplace.type}</span>
                 </div>
                 <div className="flex items-center">
-                  <svg className="w-4 h-4 mr-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path d="M4 4h16v16H4z" />
-                  </svg>
-                  Ukuran: <span className="ml-auto font-medium">3×4 m²</span>
+                  <Ruler className="w-4 h-4 stroke-1 mr-2"/>
+                  Ukuran: <span className="ml-auto font-medium">{+marketplace.size_length} × {+marketplace.size_width} m²</span>
                 </div>
                 <div className="flex items-center">
-                  <svg className="w-4 h-4 mr-2 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  Diunggah pada: <span className="ml-auto font-medium">May 10, 2023</span>
+                  <Calendar className="w-4 h-4 stroke-1 mr-2"/>
+                  Diunggah pada: <span className="ml-auto font-medium">{formatDate(marketplace.created_at)}</span>
+                </div>
+                <div className="flex items-center">
+                  <Calendar className="w-4 h-4 stroke-1 mr-2"/>
+                  Diperbarui pada: <span className="ml-auto font-medium">{formatDate(marketplace.updated_at)}</span>
                 </div>
               </div>
               <button className="w-full mt-4 bg-black text-white py-2 rounded-lg hover:bg-gray-800 transition">
@@ -98,68 +157,65 @@ export default function Show({ marketplace }) {
               </button>
             </div>
 
-            <div className="bg-white text-black rounded-xl p-6 shadow-sm">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">
-                  <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.652 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
+            <div className="p-6 bg-white border border-gray-200 rounded-xl shadow-sm">
+                <div className="flex items-center mb-3 space-x-3">
+                    <div className="flex items-center justify-center text-gray-500 bg-gray-200 rounded-full w-11 h-11">
+                        <User className="w-5 h-5" />
+                    </div>
+                    <div>
+                        <div className="font-semibold text-gray-800">Informasi Pemilik</div>
+                        <div className="text-sm text-gray-600">{marketplace.user ? marketplace.user.name : 'Nama Tidak Tersedia'}</div>
+                    </div>
                 </div>
-                <div>
-                  <div className="font-medium">Property Solutions Inc.</div>
+                <div className="space-y-2 text-sm">
+                    <div className="flex items-center text-gray-700">
+                        <Phone className="w-4 h-4 mr-2 text-gray-500" />
+                        {placeholderPhoneNumber}
+                    </div>
                 </div>
-              </div>
-              <div className="mt-4 space-y-1 text-sm">
-                <div className="flex items-center text-gray-700">
-                  <svg className="w-4 h-4 mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path d="M3 5h18M3 19h18M5 3v18M19 3v18M9 9h6v6H9z" />
-                  </svg>
-                  +62 812-3456-7890
-                </div>
-              </div>
             </div>
           </div>
         </div>
 
 
-        {/* Details */}
-        <div className="mt-6 space-y-6">
-          <section>
-            <div className="flex items-center gap-2 text-lg font-semibold text-gray-800 mb-2">
-              <Star className="w-5 h-5 text-yellow-400" />
-              Fitur Unggulan
-            </div>
-            <ul className="list-disc pl-6 text-gray-700 leading-relaxed">
-              {listing.features.map((feat, idx) => (
-                <li key={idx}>{feat}</li>
-              ))}
-            </ul>
-          </section>
-
+        {/* Deskripsi */}
+        <div className="mt-6 space-y-6 bg-white text-black rounded-xl p-6 shadow-sm">
           <section>
             <div className="flex items-center gap-2 text-lg font-semibold text-gray-800 mb-2">
               <Info className="w-5 h-5" />
               Deskripsi
             </div>
-            <p className="text-gray-700 leading-relaxed">{listing.description}</p>
+            <p className="text-gray-700 leading-relaxed">{marketplace.description}</p>
           </section>
+        </div>
 
-          <section className="pt-6 border-t border-gray-200">
+        {/* Alamat */}
+        <div className="mt-6 space-y-6 bg-white text-black rounded-xl p-6 shadow-sm">
+          <section>
             <div className="flex items-center gap-2 text-lg font-semibold text-gray-800 mb-2">
-              <Phone className="w-5 h-5" />
-              Kontak Pemilik
+              <MapPinned className="w-5 h-5" />
+              Alamat
             </div>
-            <div className="text-gray-700 space-y-1">
-              <p className="flex items-center gap-2">
-                <User className="w-4 h-4" />
-                {listing.owner.name}
-              </p>
-              <p className="flex items-center gap-2">
-                <Phone className="w-4 h-4" />
-                {listing.owner.phone}
-              </p>
-            </div>
+            <p className="text-gray-700 leading-relaxed">{marketplace.address}</p>
+
           </section>
+          {hasValidLocation && (
+            <section>
+                <div className="flex items-center gap-2 mb-3 text-xl font-semibold text-gray-800">
+                    <Globe className="w-5 h-5 text-gray-600" />
+                    Lokasi di Peta
+                </div>
+                <div className="w-full overflow-hidden rounded-lg h-80 md:h-96"> {/* Memberi tinggi pada container iframe */}
+                    <iframe
+                        loading="lazy"
+                        allowFullScreen
+                        className="w-full h-full border-0"
+                        src={`https://www.openstreetmap.org/export/embed.html?bbox=${parseFloat(marketplace.long) - 0.005},${parseFloat(marketplace.lat) - 0.005},${parseFloat(marketplace.long) + 0.005},${parseFloat(marketplace.lat) + 0.005}&layer=mapnik&marker=${marketplace.lat},${marketplace.long}`}
+                        title="Peta Lokasi Lapak"
+                    ></iframe>
+                </div>
+            </section>
+          )}
         </div>
       </div>
     </AuthenticatedLayout>

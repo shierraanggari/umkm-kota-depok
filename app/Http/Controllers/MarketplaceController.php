@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Enums\MarketplaceType;
 use App\Enums\Kelurahan;
 use App\Enums\Kecamatan;
+use Illuminate\Support\Number;
 
 class MarketplaceController extends Controller implements HasMiddleware
 {
@@ -29,15 +30,20 @@ class MarketplaceController extends Controller implements HasMiddleware
     public function index()
     {
         $marketplaces = Marketplace::with('user')->latest()->get()->map(function ($item) {
+            $item->price = Number::currency($item->price, 'IDR', 'id_ID');
             $item->kecamatan = Kecamatan::labels()[$item->kecamatan] ?? $item->kecamatan;
             $item->kelurahan = Kelurahan::labels()[$item->kelurahan] ?? $item->kelurahan;
             $item->type = MarketplaceType::labels()[$item->type] ?? $item->type;
+
+            $firstMedia = $item->getFirstMedia('photos');
+            $item->photo = $firstMedia ? $firstMedia->getUrl() : null;
 
             return $item;
         });
 
         return inertia('Marketplaces/Index', [
             'marketplaces' => $marketplaces,
+            'auth_user_id' => auth()->id(),
         ]);
     }
 
@@ -61,23 +67,32 @@ class MarketplaceController extends Controller implements HasMiddleware
         $validated = $request->validate([
             'name' => 'required|string',
             'type' => 'required|in:' . implode(',', MarketplaceType::values()),
-            'description' => 'nullable|string',
-            'size_length' => 'nullable|numeric|min:0',
-            'size_width' => 'nullable|numeric|min:0',
+            'description' => 'required|string',
+            'size_length' => 'required|numeric|min:0',
+            'size_width' => 'required|numeric|min:0',
             'price' => 'required|numeric|min:0',
             'price_type' => 'required|in:yearly,monthly',
-            'kecamatan' => 'nullable|string',
-            'kelurahan' => 'nullable|string',
+            'kecamatan' => 'required|string',
+            'kelurahan' => 'required|string',
             'address' => 'nullable|string|max:255',
             'long' => 'nullable|numeric',
             'lat' => 'nullable|numeric',
+            'photos.*' => 'nullable|image|mimes:jpeg,png,jpg,heif|max:2048',
         ]);
 
         $validated['user_id'] = auth()->id();
 
-        Marketplace::create($validated);
+        $marketplace = Marketplace::create($validated);
 
-        return redirect()->route('marketplace.index')->with('success', 'Lapak berhasil dibuat.');
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
+                $marketplace->addMedia($photo)->toMediaCollection('photos');
+            }
+        }
+
+        session()->flash('success', 'Lapak berhasil dibuat.');
+
+        return redirect()->route('marketplace.index');
     }
 
     /**
@@ -85,10 +100,22 @@ class MarketplaceController extends Controller implements HasMiddleware
      */
     public function show(Marketplace $marketplace)
     {
+        $marketplace->load('user');
+        
+        $marketplace->price = Number::currency($marketplace->price, 'IDR', 'id_ID');
+        $marketplace->kecamatan = Kecamatan::labels()[$marketplace->kecamatan] ?? $marketplace->kecamatan;
+        $marketplace->kelurahan = Kelurahan::labels()[$marketplace->kelurahan] ?? $marketplace->kelurahan;
+        $marketplace->type = MarketplaceType::labels()[$marketplace->type] ?? $marketplace->type;
+        
         return inertia('Marketplaces/Show', [
-            'marketplace' => $marketplace->load('user')
+            'marketplace' => $marketplace,
+            'photos' => $marketplace->getMedia('photos')->map(function ($media) {
+                return [
+                    'id' => $media->id,
+                    'url' => $media->getUrl(),
+                ];
+            })->toArray(),
         ]);
-        // dd($marketplace->load('user'));
     }
 
     /**
@@ -96,16 +123,32 @@ class MarketplaceController extends Controller implements HasMiddleware
      */
     public function edit(Marketplace $marketplace)
     {
-        // if (!auth()->user()->can('lapak edit')) {
-        //     abort(403, 'Tidak.');
-        // }
-
-        if ($marketplace->user_id !== auth()->id()) {
+        if ($marketplace->user_id !== auth()->id() && auth()->id() !== 1) {
             abort(403, 'No permission.');
         };
 
         return inertia('Marketplaces/Edit', [
-            'marketplace' => $marketplace,
+            'marketplace' => [
+                'id' => $marketplace->id,
+                'name' => $marketplace->name,
+                'type' => $marketplace->type,
+                'description' => $marketplace->description,
+                'size_length' => $marketplace->size_length,
+                'size_width' => $marketplace->size_width,
+                'price' => $marketplace->price,
+                'price_type' => $marketplace->price_type,
+                'kecamatan' => $marketplace->kecamatan,
+                'kelurahan' => $marketplace->kelurahan,
+                'address' => $marketplace->address,
+                'long' => $marketplace->long,
+                'lat' => $marketplace->lat,
+                'photos' => $marketplace->getMedia('photos')->map(function ($media) {
+                    return [
+                        'id' => $media->id,
+                        'url' => $media->getUrl(),
+                    ];
+                })->toArray(),
+            ],
             'types' => MarketplaceType::options(),
             'kelurahans' => Kelurahan::groupedByKecamatan(),
             'kecamatans' => Kecamatan::options(),
@@ -117,28 +160,60 @@ class MarketplaceController extends Controller implements HasMiddleware
      */
     public function update(Request $request, Marketplace $marketplace)
     {
+        // if ($marketplace->user_id !== auth()->id() && !auth()->user()->hasRole('admin')) {
+        //      abort(403, 'Anda tidak memiliki izin untuk memperbarui lapak ini.');
+        // }
+
+        if ($marketplace->user_id !== auth()->id() && auth()->id() !== 1) {
+            abort(403, 'No permission.');
+        };
+
         $validated = $request->validate([
             'name' => 'required|string',
             'type' => 'required|in:' . implode(',', MarketplaceType::values()),
-            'description' => 'nullable|string',
-            'size_length' => 'nullable|numeric|min:0',
-            'size_width' => 'nullable|numeric|min:0',
+            'description' => 'required|string',
+            'size_length' => 'required|numeric|min:0',
+            'size_width' => 'required|numeric|min:0',
             'price' => 'required|numeric|min:0',
             'price_type' => 'required|in:yearly,monthly',
-            'kecamatan' => 'nullable|string',
-            'kelurahan' => 'nullable|string',
+            'kecamatan' => 'required|string',
+            'kelurahan' => 'required|string',
             'address' => 'nullable|string|max:255',
             'long' => 'nullable|numeric',
-            'lat' => 'nullable|numeric',
+            'lat' => 'nullable|numeric',            
+            'photos.*' => 'nullable|image|mimes:jpeg,png,jpg,heif|max:2048',
+            'deleted_photos.*' => 'nullable|integer|exists:media,id'
         ]);
-
-        if ($marketplace->user_id !== auth()->id()) {
-            abort(403, 'Anda tidak memiliki izin untuk mengedit lapak ini.');
+        
+        if (!empty($validated['deleted_photos'])) {
+            foreach ($validated['deleted_photos'] as $mediaId) {
+                $media = $marketplace->media()->find($mediaId);
+                if ($media && $media->model_id === $marketplace->id && $media->model_type === get_class($marketplace)) {
+                    $media->delete();
+                }
+            }
         }
+
+        $currentPhotosCount = $marketplace->fresh()->getMedia('photos')->count();
+        $newPhotosCount = count($request->file('photos') ?? []);
+
+        if (($currentPhotosCount + $newPhotosCount) > 5) {
+            return back()->withErrors(['photos' => 'Jumlah total foto tidak boleh melebihi 5. Lapak saat ini memiliki ' . $currentPhotosCount . ' foto dan Anda mencoba menambahkan ' . $newPhotosCount . ' foto baru.'])->withInput();
+        }
+
+        $marketplaceData = collect($validated)->except(['photos', 'deleted_photos'])->toArray();     
 
         $marketplace->update($validated);
 
-        return redirect()->route('marketplace.index')->with('success', 'Lapak berhasil diperbarui.');
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $photo) {
+                $marketplace->addMedia($photo)->toMediaCollection('photos');
+            }
+        }
+
+        session()->flash('success', 'Lapak berhasil diperbarui.');
+
+        return redirect()->route('marketplace.index');
     }
 
     /**
@@ -146,6 +221,12 @@ class MarketplaceController extends Controller implements HasMiddleware
      */
     public function destroy(Marketplace $marketplace)
     {
+        if ($marketplace->user_id !== auth()->id() && auth()->id() !== 1) {
+            abort(403, 'No permission.');
+        };
+
+        $marketplace->clearMediaCollection('photos');
+
         $marketplace->delete();
 
         return redirect()->route('marketplace.index')->with('success', 'Lapak berhasil dihapus.');

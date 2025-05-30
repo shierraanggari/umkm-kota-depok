@@ -23,14 +23,6 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Route::resource('/marketplace', MarketplaceController::class)
-//     ->only(['index', 'show']);
-
-// Route::middleware(['auth'])->group(function () {
-//     Route::resource('/marketplace', MarketplaceController::class)
-//         ->except(['index', 'show']);
-// });
-
 Route::get('/discussions', function () {
     return Inertia::render('Discussions/CreateCommunity');
 })->middleware(['auth', 'verified'])->name('discussions');
