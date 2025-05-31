@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->foreignId('user_id')->nullable()->constrained('users')->onUpdate('cascade')->onDelete('set null');
+            $table->foreignId('community_id')->nullable()->constrained('communities')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
         });
     }

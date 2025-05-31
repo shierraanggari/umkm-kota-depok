@@ -1,6 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 
-export default function DetailPost() {
+export default function Detail() {
   return (
     <AuthenticatedLayout>
         <div className="p-4">

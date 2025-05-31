@@ -7,10 +7,43 @@ use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
 {
-    /** @use HasFactory<\Database\Factories\PostFactory> */
     use HasFactory;
 
+    /**
+     *
+     * @var array<int, string>
+     */
     protected $fillable = [
-        'body'
+        'title',
+        'description',
+        'user_id',
+        'community_id',
     ];
+    
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    
+    public function community()
+    {
+        return $this->belongsTo(Community::class);
+    }
+    
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+    
+    public function likers()
+    {
+        return $this->belongsToMany(User::class, 'like_post')
+                    ->withTimestamps();
+    }
+    
+    public function bookmarkers()
+    {
+        return $this->belongsToMany(User::class, 'bookmark_post')
+                    ->withTimestamps();
+    }
 }

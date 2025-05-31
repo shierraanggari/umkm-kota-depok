@@ -1,6 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 
-export default function EditCommunity() {
+export default function Edit() {
     return(
         <AuthenticatedLayout>
             <div className="p-4 space-y-2">

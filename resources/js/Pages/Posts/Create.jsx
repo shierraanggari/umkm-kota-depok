@@ -1,6 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 
-export default function CreatePost() {
+export default function Create() {
   return (
     <AuthenticatedLayout
         header={

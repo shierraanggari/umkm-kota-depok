@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('kecamatan')->nullable();
             $table->string('kelurahan')->nullable();
             $table->text('address')->nullable();
+            $table->text('phone_number')->nullable();
             $table->string('long')->nullable();
             $table->string('lat')->nullable(); 
             $table->foreignId('user_id')->nullable()->constrained('users')->onUpdate('cascade')->onDelete('set null');

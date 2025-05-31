@@ -47,6 +47,51 @@ class User extends Authenticatable
         ];
     }
 
+    public function marketplaces()
+    {
+        return $this->hasMany(Marketplace::class);
+    }
+
+    public function communities()
+    {
+        return $this->belongsToMany(Community::class, 'communities_users')
+                    ->withTimestamps();
+    }
+
+    public function bannedInCommunities()
+    {
+        return $this->belongsToMany(Community::class, 'banned_users')
+                    ->withTimestamps();
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function likedPosts()
+    {
+        return $this->belongsToMany(Post::class, 'like_post')
+                    ->withTimestamps();
+    }
+
+    public function bookmarkedPosts()
+    {
+        return $this->belongsToMany(Post::class, 'bookmark_post')
+                    ->withTimestamps();
+    }
+
+    public function likedComments()
+    {
+        return $this->belongsToMany(Comment::class, 'comment_like')
+                    ->withTimestamps();
+    }
+
     public function getUserPermissions()
     {
         return $this->getAllPermissions()->mapWithKeys(fn($permission) => [$permission['name'] => true]);

@@ -369,7 +369,7 @@ export default function Create({ types, kelurahans, kecamatans }) {
                                 disabled={processing}
                                 className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
                             >
-                            Buat Post Lapak
+                            {processing ? 'Menyimpan...' : 'Buat Post Lapak'}
                             </Button>
                         </div>
                     </form>
