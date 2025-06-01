@@ -2,7 +2,12 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Button } from '@/Components/ui/button';
 import { Link, usePage } from '@inertiajs/react';
 import hasAnyPermission from '@/Utils/Permission';
-import { Users, MessageSquare, Eye, PlusCircle, Search } from 'lucide-react';
+import { Users, 
+    MessageSquare, 
+    Eye, 
+    PlusCircle, 
+    Search,
+    CheckCircle } from 'lucide-react';
 
 const SimplePagination = ({ links }) => {
     if (!links || links.length <= 3) return null;
@@ -25,13 +30,12 @@ const SimplePagination = ({ links }) => {
     );
 };
 
-export default function Index({ communities, auth }) {
+export default function Index({ communities, auth_user_id }) {
     const { props: pageProps } = usePage();
     const permission = pageProps.permission || {};
 
     return (
         <AuthenticatedLayout
-            user={auth.user}
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800">
                     Pilih Komunitas Diskusi
@@ -82,23 +86,29 @@ export default function Index({ communities, auth }) {
                 {/* List */}
                 {communities && communities.data && communities.data.length > 0 ? (
                     <>
-                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                             {communities.data.map((community) => (
                             
                                 <div key={community.id} className="flex flex-col p-5 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-300">
-                                    <div className="mb-3">
-                                        
+                                    <div className="flex flex-row mb-3">                                        
                                         {/* {community.creator && (
                                             <p className="mb-1 text-xs text-gray-500">
                                                 Dibuat oleh: <span className="font-medium text-gray-700">{community.creator.name}</span>
                                             </p>
                                         )} */}
-                                        <h3 className="text-xl font-bold text-gray-900 truncate group">
-                                            
+                                        <h3 className="flex items-center text-xl font-bold text-gray-900">                                            
                                             <Link href={route('community.show', community.id)} className="group-hover:text-blue-600 transition-colors">
                                                 {community.name}
                                             </Link>
                                         </h3>
+                                        {auth_user_id && (
+                                            (community.members && community.members.length > 0) && (
+                                                <div className="flex items-center text-center justify-center px-2 py-1 m-2 text-xs font-medium text-green-700 bg-green-100 border border-green-300 rounded-md">
+                                                    {/* <CheckCircle className="w-4 h-4 mr-1.5" /> */}
+                                                    Sudah Bergabung
+                                                </div>
+                                            )
+                                        )}
                                     </div>
                                     <p className="flex-grow mt-1 text-sm text-gray-700_leading-relaxed line-clamp-3">{community.description}</p> 
                                     <div className="flex items-center justify-between mt-4 text-xs text-gray-600">

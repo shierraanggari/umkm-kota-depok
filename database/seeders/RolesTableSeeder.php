@@ -27,8 +27,13 @@ class RolesTableSeeder extends Seeder
 
             'post index',
             'post create',
-            'post edit own',
-            'post delete own',
+            'post edit',
+            'post delete',
+
+            'community index',
+            'community create',
+            'community edit',
+            'community delete',
         ];
 
         $adminRole->syncPermissions($adminPermissions);

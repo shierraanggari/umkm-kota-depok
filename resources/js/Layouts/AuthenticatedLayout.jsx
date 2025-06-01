@@ -42,15 +42,10 @@ export default function AuthenticatedLayout({ header, children }) {
                                 </NavLink>
                                 <NavLink
                                     href={route('community.index')}
-                                    active={route().current('community*')}
+                                    active={route().current('community*') || route().current('post*')}
                                 >
                                     Forum Diskusi UMKM
                                 </NavLink>
-                                {hasAnyPermission(['user index']) &&
-                                    <NavLink href={route('users.index')} active={route().current('users*')}>
-                                    User
-                                    </NavLink>
-                                }
                             </div>
                         </div>
 
@@ -163,7 +158,7 @@ export default function AuthenticatedLayout({ header, children }) {
                         </ResponsiveNavLink>
                         <ResponsiveNavLink
                             href={route('community.index')}
-                            active={route().current('community*')}
+                            active={route().current('community*') || route().current('post*')}
                         >
                             Forum Diskusi UMKM
                         </ResponsiveNavLink>

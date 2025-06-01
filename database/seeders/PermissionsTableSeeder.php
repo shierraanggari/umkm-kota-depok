@@ -31,10 +31,8 @@ class PermissionsTableSeeder extends Seeder
 
         'post index',
         'post create',
-        'post edit own',
-        'post edit any',
-        'post delete own',
-        'post delete any',
+        'post edit',
+        'post delete',
 
         'community index',
         'community create',

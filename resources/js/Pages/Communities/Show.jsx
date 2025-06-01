@@ -1,9 +1,12 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Link } from "@inertiajs/react";
+import { Link, router } from "@inertiajs/react";
 import { Button } from "@/Components/ui/button";
 import { Settings,
     MessageSquare,
-    PlusCircle
+    PlusCircle,
+    ThumbsUp,
+    User,
+    ArrowLeft
  } from "lucide-react";
 
 const formatDate = (dateString) => {
@@ -36,14 +39,14 @@ const SimplePagination = ({ links }) => {
     );
 };
 
-export default function Show({ community, posts, isMember, isCreatorOrAdmin}) {
+export default function Show({ community, posts, isMember, isCreator, isAdmin}) {
 
     const handleJoinCommunity = () => {
-        router.post(route('communities.join', community.id), {}, { preserveScroll: true });
+        router.post(route('community.join', community.id), {}, { preserveScroll: true });
     };
 
     const handleLeaveCommunity = () => {
-        router.post(route('communities.leave', community.id), {}, { preserveScroll: true });
+        router.post(route('community.leave', community.id), {}, { preserveScroll: true });
     };
     
     return (
@@ -55,6 +58,14 @@ export default function Show({ community, posts, isMember, isCreatorOrAdmin}) {
             }
         >
             <div className="p-4 mt-2 space-y-4">
+                <Link
+                    href={route('community.index')}
+                    className="flex items-center mb-6 text-sm text-gray-500 transition-colors hover:text-blue-600"
+                >
+                    <ArrowLeft className="w-4 h-4 mr-1" />
+                    Kembali ke Daftar Komunitas
+                </Link>
+
                 <div className="p-4 border rounded-md shadow-sm bg-white">
                     <h2 className="text-lg font-semibold mb-2">Tentang Komunitas</h2>
                     <p className="text-gray-800 mb-4">
@@ -63,9 +74,7 @@ export default function Show({ community, posts, isMember, isCreatorOrAdmin}) {
                     <div className="flex justify-between items-center text-sm text-gray-600">
                         <span>Dibuat pada {formatDate(community.created_at)}</span>
                         <div className="flex items-center gap-1">
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a4 4 0 00-4-4h-1M9 20H4v-2a4 4 0 014-4h1m0-4a4 4 0 118 0 4 4 0 01-8 0z" />
-                            </svg>
+                            <User className="w-4 h-4 stroke-2 mr-1"/>
                             <span>{community.members_count} anggota</span>
                         </div>
                     </div>
@@ -73,15 +82,15 @@ export default function Show({ community, posts, isMember, isCreatorOrAdmin}) {
                 
                 <div className="flex flex-col md:flex-row justify-end gap-3">
                     <h2 className="flex-auto text-2xl font-semibold text-gray-800">Postingan di Komunitas Ini</h2>
-                    {isCreatorOrAdmin && (
+                    {(isCreator || isAdmin) && (
                         <Link href={route('community.edit', community.id)}>
-                            <Button variant="outline" className="flex items-center w-full md:w-fit">
+                            <Button className="flex bg-white border-slate-300 border-2 text-black hover:text-white hover:border-neutral-800 items-center w-full md:w-fit">
                                 <Settings className="w-4 h-4 mr-2" />
                                 Kelola Komunitas
                             </Button>
                         </Link>
                     )}
-                    {isMember && !isCreatorOrAdmin && (
+                    {isMember && !isCreator && (
                          <Button onClick={handleLeaveCommunity} variant="destructive" className="flex items-center w-full md:w-fit">
                             Keluar Komunitas
                         </Button>
@@ -91,12 +100,14 @@ export default function Show({ community, posts, isMember, isCreatorOrAdmin}) {
                             Gabung Komunitas
                         </Button>
                     )}
-                    <Link href={route('post.create', { community_id: community.id })}>
-                        <Button className="flex items-center w-full md:w-fit">
-                            <PlusCircle className="w-4 h-4 mr-2" />
-                            Buat Postingan
-                        </Button>
-                    </Link>
+                    {(isMember || isAdmin || isCreator) && (
+                        <Link href={route('post.create', { community_id: community.id })}>
+                            <Button className="flex items-center w-full md:w-fit">
+                                <PlusCircle className="w-4 h-4 mr-2" />
+                                Buat Postingan
+                            </Button>
+                        </Link>
+                    )}
                 </div>
 
                 <div className="mt-2">
@@ -116,7 +127,7 @@ export default function Show({ community, posts, isMember, isCreatorOrAdmin}) {
                                     </div>
 
                                     <h3 className="mb-2 text-xl font-bold text-gray-800 hover:text-blue-600">                                        
-                                        <Link href={route('posts.show', post.id)}>
+                                        <Link href={route('post.show', post.id)}>
                                             {post.name}
                                         </Link>
                                     </h3>
@@ -132,7 +143,7 @@ export default function Show({ community, posts, isMember, isCreatorOrAdmin}) {
                                             </span>
                                         </div>
                                         <Link
-                                            href={route('posts.show', post.id)}
+                                            href={route('post.show', post.id)}
                                             className="font-medium text-blue-600 hover:text-blue-700">
                                             Lihat Selengkapnya
                                         </Link>

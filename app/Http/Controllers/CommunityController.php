@@ -7,30 +7,36 @@ use App\Models\Community;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Http\Request; 
-use Illuminate\Support\Facades\Auth; 
 use Inertia\Inertia; 
 
 class CommunityController extends Controller implements HasMiddleware
 {
     
-    public static function middleware(): array
+    public static function middleware()
     {
         return [
             new Middleware('permission:community index', only: ['index', 'show']),
             new Middleware('permission:community create', only: ['create', 'store']),
             new Middleware('permission:community edit', only: ['edit', 'update']),
             new Middleware('permission:community delete', only: ['destroy']),
-            new Middleware('auth', only: ['join', 'leave', 'banUser', 'unbanUser', 'manageMembersPage']),
+            new Middleware('auth', only: ['join', 'leave', 'banUser', 'unbanUser']),
         ];
     }
     
     public function index()
     {
-        $communities = Community::withCount('members', 'posts')
-            ->with('creator:id,name')
-            ->latest()
-            ->paginate(9);
+        $query = Community::query()
+            ->withCount(['members', 'posts']) 
+            ->with('creator:id,name');  
+        
+        if (auth()->check()) {
+            $currentUserId = auth()->id();
+            $query->with(['members' => function ($q) use ($currentUserId) {
+                $q->where('users.id', $currentUserId);
+            }]);
+        }
 
+        $communities = $query->latest()->paginate(9)->withQueryString();
         return inertia('Communities/Index', [
             'communities' => $communities,
             'auth_user_id' => auth()->id(),
@@ -74,14 +80,18 @@ class CommunityController extends Controller implements HasMiddleware
             ->latest()
             ->paginate(10);
 
-        $isMember = Auth::check() ? $community->members()->where('user_id', auth()->id())->exists() : false;
-        $isCreatorOrAdmin = Auth::check() ? ($community->creator_id === auth()->id() || (Auth::user() && auth()->id() === 1)) : false;
+        $isMember = auth()->check() ? $community->members()->where('user_id', auth()->id())->exists() : false;
+
+        $isCreator = auth()->check() ? ($community->creator_id === auth()->id()) : false;
+
+        $isAdmin = auth()->check() ? ((auth()->user() && auth()->id() === 1)) : false;
 
         return inertia('Communities/Show', [
             'community' => $community,
             'posts' => $posts,
             'isMember' => $isMember,
-            'isCreatorOrAdmin' => $isCreatorOrAdmin,
+            'isCreator' => $isCreator,
+            'isAdmin' => $isAdmin,
             'auth_user_id' => auth()->id(),
         ]);
     }
@@ -92,8 +102,17 @@ class CommunityController extends Controller implements HasMiddleware
             abort(403, 'Anda tidak memiliki izin untuk mengedit komunitas ini.');
         }
 
+        $members = $community->members()
+            ->paginate(5, ['users.id', 'users.name', 'users.email'], 'members_page');
+
+        $bannedUsers = $community->bannedUsers()
+            ->paginate(5, ['users.id', 'users.name', 'users.email'], 'banned_page');
+
         return inertia('Communities/Edit', [
             'community' => $community,
+            'members' => $members,
+            'banned_users' => $bannedUsers,
+            'auth_user_id' => auth()->id(),
         ]);
     }
 
@@ -104,13 +123,13 @@ class CommunityController extends Controller implements HasMiddleware
         }
 
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255', \Illuminate\Validation\Rule::unique('communities')->ignore($community->id)],
-            'description' => ['required', 'string', 'max:1000'],
+            'name' => 'required|string|max:255|unique:communities',
+            'description' => 'required|string|max:1000',
         ]);
 
         $community->update($validated);
 
-        return redirect()->route('communities.show', $community->id)->with('success', 'Komunitas berhasil diperbarui.');
+        return redirect()->route('community.edit', $community->id)->with('success', 'Komunitas berhasil diperbarui.');
     }
 
     public function destroy(Community $community)
@@ -119,7 +138,7 @@ class CommunityController extends Controller implements HasMiddleware
             abort(403, 'Anda tidak memiliki izin untuk menghapus komunitas ini.');
         }
         $community->delete();
-        return redirect()->route('communities.index')->with('success', 'Komunitas berhasil dihapus.');
+        return redirect()->route('community.index')->with('success', 'Komunitas berhasil dihapus.');
     }
 
     public function join(Community $community)
@@ -127,6 +146,7 @@ class CommunityController extends Controller implements HasMiddleware
         if ($community->members()->where('user_id', auth()->id())->exists()) {
             return back()->with('warning', 'Anda sudah menjadi anggota komunitas ini.');
         }
+
         if ($community->bannedUsers()->where('user_id', auth()->id())->exists()) {
             return back()->with('error', 'Anda tidak dapat bergabung karena telah diban dari komunitas ini.');
         }
@@ -137,49 +157,41 @@ class CommunityController extends Controller implements HasMiddleware
 
     public function leave(Community $community)
     {
-        if (!\Illuminate\Support\Facades\Auth::check() || !$community->members()->where('user_id', \Illuminate\Support\Facades\Auth::id())->exists()) {
+        if (!auth()->check() || !$community->members()->where('user_id', auth()->id())->exists()) {
             return back()->with('warning', 'Anda bukan anggota komunitas ini.');
         }
-        if ($community->creator_id === \Illuminate\Support\Facades\Auth::id()) {
+
+        if ($community->creator_id === auth()->id()) {
              return back()->with('error', 'Sebagai pembuat, Anda tidak dapat meninggalkan komunitas ini. Anda dapat menghapusnya.');
         }
 
-        $community->members()->detach(\Illuminate\Support\Facades\Auth::id());
+        $community->members()->detach(auth()->id());
         return back()->with('success', 'Anda berhasil keluar dari komunitas ' . $community->name);
-    }
-
-    public function manageMembersPage(Community $community)
-    {
-        if ($community->creator_id !== Auth::id() && Auth::id() !== 1) {
-            abort(403, 'Anda tidak memiliki izin untuk mengelola komunitas ini.');
-        }
-        $community->load('members:id,name,email', 'bannedUsers:id,name,email');
-
-        return Inertia::render('Communities/ManageCommunityMembers', [
-            'community' => $community,
-        ]);
     }
 
     public function banUser(Request $request, Community $community, User $userToBan)
     {
-        if ($community->creator_id !== Auth::id() && Auth::id() !== 1) {
+        if ($community->creator_id !== auth()->id() && auth()->id() !== 1) {
             abort(403, 'Anda tidak memiliki izin untuk melakukan tindakan ini.');
         }
-        if ($userToBan->id === Auth::id() || $userToBan->id === $community->creator_id || ($userToBan->id === 1 && Auth::id() !== 1) ) {
+
+        if ($userToBan->id === auth()->id() || $userToBan->id === $community->creator_id || ($userToBan->id === 1 && auth()->id() !== 1) ) {
              return back()->with('error', 'Tidak dapat mem-ban pengguna ini.');
         }
 
         $community->members()->detach($userToBan->id);
+
         if (!$community->bannedUsers()->where('user_id', $userToBan->id)->exists()) {
             $community->bannedUsers()->attach($userToBan->id, ['created_at' => now(), 'updated_at' => now()]);
             return back()->with('success', $userToBan->name . ' berhasil diban dari komunitas.');
         }
-        return back()->with('info', $userToBan->name . ' sudah ada dalam daftar ban.');
+
+        return redirect()->route('community.edit', $community->id)->with('success', $userToBan->name . ' berhasil diban dari komunitas.');
     }
 
     public function unbanUser(Community $community, User $userToUnban)
     {
-        if ($community->creator_id !== Auth::id() && Auth::id() !== 1) {
+        if ($community->creator_id !== auth()->id() && auth()->id() !== 1) {
             abort(403, 'Anda tidak memiliki izin untuk melakukan tindakan ini.');
         }
 
