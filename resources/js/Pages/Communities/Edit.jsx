@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Link, router, usePage, useForm } from "@inertiajs/react";
+import { Link, router, usePage, useForm, Head } from "@inertiajs/react";
 import { Button } from "@/Components/ui/button";
 import { Save,
     Users,
@@ -82,6 +82,8 @@ export default function Edit({ community, members, banned_users, auth_user_id })
                 </h2>
             }
         >
+            <Head title="Kelola Komunitas"/>
+
             <div className="p-4 space-y-2">
                 <Link
                     href={route('community.show', community.id)}

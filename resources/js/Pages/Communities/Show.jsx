@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Link, router } from "@inertiajs/react";
+import { Link, router, Head } from "@inertiajs/react";
 import { Button } from "@/Components/ui/button";
 import { Settings,
     MessageSquare,
@@ -40,6 +40,7 @@ const SimplePagination = ({ links }) => {
 };
 
 export default function Show({ community, posts, isMember, isCreator, isAdmin}) {
+    // const userPhotoUrl = post.user?.profile_photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user?.name || 'User')}&color=7F9CF5&background=EBF4FF`;
 
     const handleJoinCommunity = () => {
         router.post(route('community.join', community.id), {}, { preserveScroll: true });
@@ -57,7 +58,10 @@ export default function Show({ community, posts, isMember, isCreator, isAdmin}) 
                 </h2>
             }
         >
+            <Head title={community.name}/>
+
             <div className="p-4 mt-2 space-y-4">
+                {/* Button Back */}
                 <Link
                     href={route('community.index')}
                     className="flex items-center mb-6 text-sm text-gray-500 transition-colors hover:text-blue-600"
@@ -66,6 +70,7 @@ export default function Show({ community, posts, isMember, isCreator, isAdmin}) 
                     Kembali ke Daftar Komunitas
                 </Link>
 
+                {/* Tentang Komunitas */}
                 <div className="p-4 border rounded-md shadow-sm bg-white">
                     <h2 className="text-lg font-semibold mb-2">Tentang Komunitas</h2>
                     <p className="text-gray-800 mb-4">
@@ -80,6 +85,7 @@ export default function Show({ community, posts, isMember, isCreator, isAdmin}) 
                     </div>
                 </div>
                 
+                {/* Tombol */}
                 <div className="flex flex-col md:flex-row justify-end gap-3">
                     <h2 className="flex-auto text-2xl font-semibold text-gray-800">Postingan di Komunitas Ini</h2>
                     {(isCreator || isAdmin) && (
@@ -109,7 +115,8 @@ export default function Show({ community, posts, isMember, isCreator, isAdmin}) 
                         </Link>
                     )}
                 </div>
-
+                
+                {/* Postingan */}
                 <div className="mt-2">
                     {posts.data && posts.data.length > 0 ? (
                         <div className="space-y-6">
@@ -117,9 +124,13 @@ export default function Show({ community, posts, isMember, isCreator, isAdmin}) 
                                 <div key={post.id} className="p-5 bg-white border border-gray-200 rounded-lg shadow-sm transition-shadow hover:shadow-md">
                                     <div className="flex items-start mb-3 space-x-3">
                                         {/* Avatar */}
-                                        <div className="flex-shrink-0 w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 text-lg font-semibold">
+                                        <img src={post.user?.profile_photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user?.name || 'User')}&color=7F9CF5&background=EBF4FF`}
+                                            alt={post.user?.name || 'User Avatar'}
+                                            className="w-10 h-10 rounded-full object-cover"
+                                        />
+                                        {/* <div className="flex-shrink-0 w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 text-lg font-semibold">
                                             {post.user ? post.user.name.charAt(0).toUpperCase() : '?'}
-                                        </div>
+                                        </div> */}
                                         <div>
                                             <p className="text-sm font-semibold text-gray-900">{post.user ? post.user.name : 'User Anonim'}</p>
                                             <p className="text-xs text-gray-500">{formatDate(post.created_at)}</p>

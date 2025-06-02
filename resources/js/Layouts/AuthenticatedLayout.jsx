@@ -15,6 +15,8 @@ export default function AuthenticatedLayout({ header, children }) {
     const { props } = usePage();
     const successMessage = props.flash?.success;
 
+    const userPhotoUrl = user?.profile_photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&color=7F9CF5&background=EBF4FF`;
+
     return (
         <div className="min-h-screen bg-gray-100 p-2">
             <nav className="border-b border-gray-100 bg-white">
@@ -59,6 +61,11 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 className="inline-flex items-center rounded-md border border-transparent bg-white px-3 py-2 text-sm font-medium leading-4 text-gray-500 transition duration-150 ease-in-out hover:text-gray-700 focus:outline-none"
                                             >
                                                 {user.name}
+                                                
+                                                <img src={userPhotoUrl}
+                                                    alt={user?.name || 'User Avatar'}
+                                                    className="w-10 h-10 ml-2 rounded-full object-cover object-center"
+                                                />
 
                                                 <svg
                                                     className="-me-0.5 ms-2 h-4 w-4"
@@ -81,6 +88,24 @@ export default function AuthenticatedLayout({ header, children }) {
                                             href={route('profile.edit')}
                                         >
                                             Profile
+                                        </Dropdown.Link>
+                                        <Dropdown.Link
+                                            href={route('profile.myMarketplaces')}
+                                            as="button"
+                                        >
+                                            Lapak Saya
+                                        </Dropdown.Link>
+                                        <Dropdown.Link
+                                            href={route('profile.myPosts')}
+                                            as="button"
+                                        >
+                                            Postingan Saya
+                                        </Dropdown.Link>
+                                        <Dropdown.Link
+                                            href={route('profile.bookmarkedPosts')}
+                                            as="button"
+                                        >
+                                            Postingan Disimpan
                                         </Dropdown.Link>
                                         <Dropdown.Link
                                             href={route('logout')}
@@ -165,18 +190,41 @@ export default function AuthenticatedLayout({ header, children }) {
                     </div>
 
                     <div className="border-t border-gray-200 pb-1 pt-4">
-                        <div className="px-4">
-                            <div className="text-base font-medium text-gray-800">
-                                {user.name}
-                            </div>
-                            <div className="text-sm font-medium text-gray-500">
-                                {user.email}
+                        <div className="flex items-center">
+                            <img src={userPhotoUrl}
+                                alt={user?.name || 'User Avatar'}
+                                className="w-10 h-10 rounded-full object-cover"/>
+                            <div className="px-4">
+                                <div className="text-base font-medium text-gray-800">
+                                    {user.name}
+                                </div>
+                                <div className="text-sm font-medium text-gray-500">
+                                    {user.email}
+                                </div>
                             </div>
                         </div>
 
                         <div className="mt-3 space-y-1">
                             <ResponsiveNavLink href={route('profile.edit')}>
                                 Profile
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink
+                                href={route('profile.myMarketplaces')}
+                                as="button"
+                            >
+                                Lapak Saya
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink
+                                href={route('profile.myPosts')}
+                                as="button"
+                            >
+                                Postingan Saya
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink
+                                href={route('profile.bookmarkedPosts')}
+                                as="button"
+                            >
+                                Postingan Disimpan
                             </ResponsiveNavLink>
                             <ResponsiveNavLink
                                 method="post"

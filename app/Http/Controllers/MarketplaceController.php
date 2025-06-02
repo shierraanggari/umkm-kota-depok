@@ -11,6 +11,7 @@ use App\Enums\MarketplaceType;
 use App\Enums\Kelurahan;
 use App\Enums\Kecamatan;
 use Illuminate\Support\Number;
+use Propaganistas\LaravelPhone\PhoneNumber;
 
 class MarketplaceController extends Controller implements HasMiddleware
 {
@@ -74,11 +75,20 @@ class MarketplaceController extends Controller implements HasMiddleware
             'price_type' => 'required|in:yearly,monthly',
             'kecamatan' => 'required|string',
             'kelurahan' => 'required|string',
+            'phone_number' => 'required|string|phone:ID,mobile',
             'address' => 'nullable|string|max:255',
             'long' => 'nullable|numeric',
             'lat' => 'nullable|numeric',
             'photos.*' => 'nullable|image|mimes:jpeg,png,jpg,heif|max:2048',
         ]);
+
+        $nomorInput = $validated['phone_number'];
+        $kodeNegara = 'ID';
+
+        $phoneNumberObject = new PhoneNumber($nomorInput, $kodeNegara);
+        $e164Formatted = $phoneNumberObject->formatE164();
+        
+        $validated['phone_number'] = $e164Formatted;
 
         $validated['user_id'] = auth()->id();
 
@@ -115,6 +125,7 @@ class MarketplaceController extends Controller implements HasMiddleware
                     'url' => $media->getUrl(),
                 ];
             })->toArray(),
+            'auth_user_id' => auth()->id(),
         ]);
     }
 
@@ -139,6 +150,7 @@ class MarketplaceController extends Controller implements HasMiddleware
                 'price_type' => $marketplace->price_type,
                 'kecamatan' => $marketplace->kecamatan,
                 'kelurahan' => $marketplace->kelurahan,
+                'phone_number' => $marketplace->phone_number,
                 'address' => $marketplace->address,
                 'long' => $marketplace->long,
                 'lat' => $marketplace->lat,
@@ -178,6 +190,7 @@ class MarketplaceController extends Controller implements HasMiddleware
             'price_type' => 'required|in:yearly,monthly',
             'kecamatan' => 'required|string',
             'kelurahan' => 'required|string',
+            'phone_number' => 'nullable|string|phone:ID,mobile',
             'address' => 'nullable|string|max:255',
             'long' => 'nullable|numeric',
             'lat' => 'nullable|numeric',            
@@ -201,9 +214,17 @@ class MarketplaceController extends Controller implements HasMiddleware
             return back()->withErrors(['photos' => 'Jumlah total foto tidak boleh melebihi 5. Lapak saat ini memiliki ' . $currentPhotosCount . ' foto dan Anda mencoba menambahkan ' . $newPhotosCount . ' foto baru.'])->withInput();
         }
 
-        $marketplaceData = collect($validated)->except(['photos', 'deleted_photos'])->toArray();     
+        $marketplaceData = collect($validated)->except(['photos', 'deleted_photos'])->toArray();  
 
-        $marketplace->update($validated);
+        $nomorInput = $marketplaceData['phone_number'];
+        $kodeNegara = 'ID';
+
+        $phoneNumberObject = new PhoneNumber($nomorInput, $kodeNegara);
+        $e164Formatted = $phoneNumberObject->formatE164();
+        
+        $marketplaceData['phone_number'] = $e164Formatted;
+
+        $marketplace->update($marketplaceData);
 
         if ($request->hasFile('photos')) {
             foreach ($request->file('photos') as $photo) {

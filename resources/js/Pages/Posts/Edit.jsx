@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Link, useForm } from "@inertiajs/react";
+import { Link, useForm, Head } from "@inertiajs/react";
 import { ArrowLeft,
     Save
  } from "lucide-react";
@@ -29,6 +29,8 @@ export default function Edit({ post, community }) {
                 </h2>
             }
         >
+            <Head title="Form Edit Postingan"/>
+
             <div className="p-4">
                 {/* Tombol Back */}
                 <Link

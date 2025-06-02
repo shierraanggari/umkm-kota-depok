@@ -1,7 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Link } from "@inertiajs/react";
+import { Link, useForm, Head } from "@inertiajs/react";
 import { Button } from "@/Components/ui/button";
-import { useForm } from "@inertiajs/react";
 
 export default function Create() {
     const { data, setData, post, processing, errors } = useForm({
@@ -24,6 +23,7 @@ export default function Create() {
                 </h2>
             }
         >
+            <Head title="Form Buat Komunitas"/>
             <div className="p-4">
                 <div className="mx-auto p-6 bg-white rounded-xl shadow border">
                     <h1 className="text-2xl font-semibold mb-4">Masukkan Data Komunitas</h1>

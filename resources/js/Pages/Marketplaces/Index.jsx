@@ -1,7 +1,7 @@
 // import Layout from "../Layout/Layout";
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Link, router } from "@inertiajs/react";
+import { Link, router, Head } from "@inertiajs/react";
 import { Button } from '@/Components/ui/button';
 import {
   MapPin,
@@ -56,6 +56,8 @@ export default function Index({ marketplaces, auth_user_id }) {
                 </h2>
             }
         >
+            <Head title="Data Lapak"/>
+
             <div className="mx-2 space-y-6 my-6">
                 <div className="border border-gray-300 rounded p-6">
                     <h2 className="text-xl font-semibold mb-4">Search Filters</h2>

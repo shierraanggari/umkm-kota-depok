@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Propaganistas\LaravelPhone\PhoneNumber;
 
 class Marketplace extends Model implements HasMedia
 {
@@ -23,6 +24,7 @@ class Marketplace extends Model implements HasMedia
         'price_type',
         'kecamatan',
         'kelurahan',
+        'phone_number',
         'address',
         'long',
         'lat',
@@ -34,10 +36,24 @@ class Marketplace extends Model implements HasMedia
         return $this->belongsTo(User::class);
     }
 
-    public function registerMediaConversions(?Media $media = null): void
+    protected $appends = [
+        'whatsapp_number',
+    ];
+
+    public function getWhatsappNumberAttribute(): ?string
     {
-        $this->addMediaConversion('thumb')
-             ->width(300)
-             ->height(300);
+        $rawPhoneNumber = $this->attributes['phone_number'] ?? null;
+        if ($rawPhoneNumber) {
+            try {
+                $phoneObj = PhoneNumber::make($rawPhoneNumber, config('phone.default_country', 'ID'));
+                if ($phoneObj->isValid()) {
+                    return $phoneObj->getCountryCode() . $phoneObj->getNationalNumber();
+                }
+            } catch (\Exception $e) {
+                return ltrim(preg_replace('/[^\d+]/', '', $rawPhoneNumber), '+');
+            }
+            return ltrim(preg_replace('/[^\d+]/', '', $rawPhoneNumber), '+');
+        }
+        return null;
     }
 }

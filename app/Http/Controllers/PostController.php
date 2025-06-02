@@ -123,7 +123,7 @@ class PostController extends Controller implements HasMiddleware
      */
     public function edit(Post $post)
     {
-        if ($post->user_id !== auth()->id() || auth()->id() !== 1) {
+        if (!($post->user_id === auth()->id() || auth()->id() === 1)) {
             abort(403, 'Anda tidak memiliki izin untuk mengedit postingan ini.');
         }
 
@@ -138,7 +138,7 @@ class PostController extends Controller implements HasMiddleware
      */
     public function update(Request $request, Post $post)
     {
-        if ($post->user_id !== auth()->id() || auth()->id() !== 1) {
+        if (!($post->user_id === auth()->id() || auth()->id() === 1)) {
             abort(403, 'Anda tidak memiliki izin untuk memperbarui postingan ini.');
         }
 

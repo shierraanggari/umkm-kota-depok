@@ -36,7 +36,7 @@ class CommunityController extends Controller implements HasMiddleware
             }]);
         }
 
-        $communities = $query->latest()->paginate(9)->withQueryString();
+        $communities = $query->latest()->paginate(8)->withQueryString();
         return inertia('Communities/Index', [
             'communities' => $communities,
             'auth_user_id' => auth()->id(),

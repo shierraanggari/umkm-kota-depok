@@ -8,7 +8,7 @@ import { Edit3,
     Send
  } from "lucide-react";
 import { Button } from "@/Components/ui/button";
-import { Link, router, useForm } from "@inertiajs/react";
+import { Link, router, useForm, Head } from "@inertiajs/react";
 
 import { formatDistanceToNow, parseISO } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
@@ -40,15 +40,21 @@ const CommentItem = ({ comment, currentUserId, onLikeComment, onDeleteComment /*
 
     return (
         <div className="flex items-start space-x-3 py-3 border-b border-gray-200 last:border-b-0">
-            <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-gray-500 font-semibold ${comment.user ? 'bg-gray-200' : 'bg-gray-300'}`}>
+            {/* Avatara */}
+            {/* <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-gray-500 font-semibold ${comment.user ? 'bg-gray-200' : 'bg-gray-300'}`}>
                 {comment.user ? comment.user.name.charAt(0).toUpperCase() : <UserCircle size={20} />}
-            </div>
+            </div> */}
+            <img src={comment.user?.profile_photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(comment.user?.name || 'User')}&color=7F9CF5&background=EBF4FF`}
+                alt={comment.user?.name || 'User Avatar'}
+                className="w-10 h-10 rounded-full object-cover"
+            />
+
             <div className="flex-1">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                         <span className="text-sm font-semibold text-gray-800">{comment.user ? comment.user.name : 'User Anonim'}</span>
                         {/* Menggunakan fungsi format tanggal baru */}
-                        <span className="text-xs text-gray-500">• {formatTimestampWithDateFns(comment.created_at)}</span>
+                        <span className="text-xs text-gray-500">• {formatTimestamp(comment.created_at)}</span>
                     </div>
                     {canEditOrDelete && (
                         <div className="flex space-x-1">
@@ -84,7 +90,7 @@ export default function Show({ auth, post }) {
 
     const handleCommentSubmit = (e) => {
         e.preventDefault();
-        postComment(route('comments.store', { post: post.id }), {
+        postComment(route('comment.store', { post: post.id }), {
             preserveScroll: true,
             onSuccess: () => resetCommentForm(),
         });
@@ -97,11 +103,11 @@ export default function Show({ auth, post }) {
         router.post(route('post.bookmark.toggle', post.id), {}, { preserveScroll: true, preserveState: true });
     };
     const handleLikeComment = (commentId) => {
-        router.post(route('comments.like.toggle', commentId), {}, { preserveScroll: true, preserveState: true });
+        router.post(route('comment.like.toggle', commentId), {}, { preserveScroll: true, preserveState: true });
     };
     const handleDeleteComment = (commentId, commentContent) => {
         if (confirm(`Apakah Anda yakin ingin menghapus komentar ini: "${commentContent.substring(0, 50)}..."?`)) {
-            router.delete(route('comments.destroy', commentId), { preserveScroll: true });
+            router.delete(route('comment.destroy', commentId), { preserveScroll: true });
         }
     };
 
@@ -113,6 +119,9 @@ export default function Show({ auth, post }) {
 
     return (
         <AuthenticatedLayout>
+
+            <Head title={`Post di ${post.community.name}`} />
+
             <div className="p-4">
                 <Link
                     href={route('community.show', post.community.id)}
@@ -125,9 +134,13 @@ export default function Show({ auth, post }) {
                 <div className="mx-auto p-6 bg-white border rounded-md shadow-sm">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 mb-4">
                         {/* Foto */}
-                        <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold ${post.user ? 'bg-blue-500' : 'bg-gray-300'}`}>
+                        <img src={post.user?.profile_photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user?.name || 'User')}&color=7F9CF5&background=EBF4FF`}
+                          alt={post.user?.name || 'User Avatar'}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                        {/* <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold ${post.user ? 'bg-blue-500' : 'bg-gray-300'}`}>
                             {post.user ? post.user.name.charAt(0).toUpperCase() : <UserCircle size={24} />}
-                        </div>
+                        </div> */}
 
                         {/* Author */}
                         <div className="flex-grow"> 
@@ -171,8 +184,8 @@ export default function Show({ auth, post }) {
                     </div>
 
                     {/* Konten */}
-                    <h1 className="text-xl font-semibold mb-2">{post.title}</h1>
-                    <p className="mb-2">
+                    <h1 className="text-base font-semibold text-gray-900 mb-1">{post.title}</h1>
+                    <p className="mb-2 text-base whitespace-pre-wrap">
                         {post.description}
                     </p>
 
@@ -229,12 +242,12 @@ export default function Show({ auth, post }) {
 
                 {/* Daftar Komentar */}
                 <div className="mt-6 p-6 bg-white border border-gray-200 rounded-xl shadow-lg">
-                    <h3 className="text-xl font-semibold text-gray-800 mb-4">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">
                         Semua Komentar
                     </h3>
                     {post.comments && post.comments.length > 0 ? (
                         post.comments.map((comment) => (
-                            <div key={comment.id} className="p-4 sm:p-5">
+                            <div key={comment.id} className="mb-2 p-2 rounded-md border border-2">
                                 <CommentItem
                                     comment={comment}
                                     currentUserId={currentUser?.id}

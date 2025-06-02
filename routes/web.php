@@ -7,6 +7,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\MarketplaceController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\InteractionController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -39,6 +40,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('/marketplace', MarketplaceController::class);
     Route::resource('/community', CommunityController::class);
     Route::resource('/post', PostController::class);
+    Route::resource('/comment', CommentController::class);
 
     // Community
     Route::post('/community/{community}/join', [CommunityController::class, 'join'])
@@ -55,12 +57,30 @@ Route::middleware('auth')->group(function () {
         ->name('post.like.toggle');
     Route::post('/post/{post}/bookmark', [InteractionController::class, 'togglePostBookmark'])
         ->name('post.bookmark.toggle');
-    Route::post('/comments/{comment}/like', [InteractionController::class, 'toggleCommentLike'])
-        ->name('comments.like.toggle');
+    Route::post('/comment/{comment}/like', [InteractionController::class, 'toggleCommentLike'])
+        ->name('comment.like.toggle');
 
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Comment
+    Route::post('/post/{post}/comment', [CommentController::class, 'store'])
+        ->name('comment.store');
+
+    // Profile
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
+    Route::delete('/profile/photo', [ProfileController::class, 'destroyPhoto'])
+        ->name('profile.photo.destroy');
+
+    // User
+    Route::get('/profile/bookmarked-posts', [UserController::class, 'bookmarkedPosts'])
+        ->name('profile.bookmarkedPosts');
+    Route::get('/profile/my-posts', [UserController::class, 'myPosts'])
+        ->name('profile.myPosts');
+    Route::get('/profile/my-marketplaces', [UserController::class, 'myMarketplaces'])
+        ->name('profile.myMarketplaces');
 });
 
 require __DIR__.'/auth.php';

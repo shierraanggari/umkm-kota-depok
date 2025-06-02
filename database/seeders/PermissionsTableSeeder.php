@@ -19,15 +19,15 @@ class PermissionsTableSeeder extends Seeder
         'lapak edit',
         'lapak delete',
 
-        'member index',
-        'member create',
-        'member edit',
-        'member delete',
+        // 'member index',
+        // 'member create',
+        // 'member edit',
+        // 'member delete',
 
-        'user index',
-        'user create',
-        'user edit',
-        'user delete',
+        // 'user index',
+        // 'user create',
+        // 'user edit',
+        // 'user delete',
 
         'post index',
         'post create',

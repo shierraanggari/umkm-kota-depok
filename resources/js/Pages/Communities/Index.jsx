@@ -1,6 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Button } from '@/Components/ui/button';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, usePage, Head } from '@inertiajs/react';
 import hasAnyPermission from '@/Utils/Permission';
 import { Users, 
     MessageSquare, 
@@ -41,6 +41,8 @@ export default function Index({ communities, auth_user_id }) {
                     Pilih Komunitas Diskusi
                 </h2>
             }>
+
+            <Head title="Komunitas"/>
 
             {/* Filter  */}
             <div className="px-4 py-6 sm:px-6 lg:px-8">

@@ -7,6 +7,11 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Enums\MarketplaceType;
+use App\Enums\Kelurahan;
+use App\Enums\Kecamatan;
+use Illuminate\Support\Number;
+
 class UserController extends Controller implements HasMiddleware
 {
 
@@ -130,5 +135,58 @@ class UserController extends Controller implements HasMiddleware
 
         // render view
         return back();
+    }
+
+    public function bookmarkedPosts()
+    {
+        $user = auth()->user();
+
+        $bookmarkedPosts = $user->bookmarkedPosts()
+            ->with(['user:id,name', 'community:id,name'])
+            ->withCount(['comments', 'likers'])
+            ->latest('bookmark_post.created_at')
+            ->paginate(10);
+
+        return inertia('Profile/BookmarkedPosts', [
+            'posts' => $bookmarkedPosts,
+        ]);
+    }
+
+    public function myPosts()
+    {
+        $user = auth()->user();
+        
+        $myPosts = $user->posts()
+            ->with('community:id,name') 
+            ->withCount(['comments', 'likers'])
+            ->latest()
+            ->paginate(10);
+
+        return inertia('Profile/MyPosts', [
+            'posts' => $myPosts,
+        ]);
+    }
+    
+    public function myMarketplaces()
+    {
+        $user = auth()->user();
+
+        $myMarketplaces = $user->marketplaces()
+            ->latest()
+            ->paginate(10)
+            ->through(function ($marketplace) {
+                $marketplace->price = Number::currency($marketplace->price, 'IDR', 'id_ID');
+                $marketplace->kecamatan = Kecamatan::labels()[$marketplace->kecamatan] ?? $marketplace->kecamatan;
+                $marketplace->kelurahan = Kelurahan::labels()[$marketplace->kelurahan] ?? $marketplace->kelurahan;
+                $marketplace->type = MarketplaceType::labels()[$marketplace->type] ?? $marketplace->type;
+
+                $firstMedia = $marketplace->getFirstMedia('photos'); 
+                $marketplace->photo_url = $firstMedia ? $firstMedia->getUrl() : null;
+                return $marketplace;
+            });
+
+        return inertia('Profile/MyMarketplaces', [
+            'marketplaces' => $myMarketplaces,
+        ]);
     }
 }

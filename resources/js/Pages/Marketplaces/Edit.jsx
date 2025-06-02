@@ -1,6 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Button } from "@/Components/ui/button"; // Asumsi Anda punya komponen Button ini
-import { useForm } from "@inertiajs/react";
+import { useForm, Head } from "@inertiajs/react";
 import { useState, useEffect } from "react"; // Impor useEffect
 
 export default function Edit({ marketplace, types, kelurahans, kecamatans, auth }) { // Tambahkan auth jika diperlukan AuthenticatedLayout
@@ -15,6 +15,7 @@ export default function Edit({ marketplace, types, kelurahans, kecamatans, auth 
         price_type: marketplace.price_type || 'monthly',
         kecamatan: marketplace.kecamatan || '',
         kelurahan: marketplace.kelurahan || '',
+        phone_number: marketplace.phone_number || '',
         address: marketplace.address || '',
         long: marketplace.long || '',
         lat: marketplace.lat || '',
@@ -116,13 +117,15 @@ export default function Edit({ marketplace, types, kelurahans, kecamatans, auth 
 
     return (
         <AuthenticatedLayout
-            user={auth.user} // Pastikan prop user diteruskan jika AuthenticatedLayout membutuhkannya
+            user={auth.user}
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800">
                     Edit Lapak: {marketplace.name}
                 </h2>
             }
         >
+            <Head title="Form Edit Lapak"/>
+
             <div className="max-w-4xl p-6 mx-auto">
                 <div className="p-6 bg-white border border-black rounded-lg shadow-md">
                     <h2 className="mb-1 text-2xl font-bold">Edit Post Lapak Usaha</h2>
@@ -131,20 +134,20 @@ export default function Edit({ marketplace, types, kelurahans, kecamatans, auth 
                     <form onSubmit={submit} className="space-y-4">
                         {/* Nama Lapak */}
                         <div>
-                            <label className="block mb-1 font-medium">Nama Lapak</label>
+                            <label className="block mb-1 font-medium">Nama Lapak<span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
                                 placeholder="Masukkan nama lapak usaha"
-                                className="w-full px-3 py-2 border rounded"
+                                className="w-full px-3 py-2 text-sm border rounded"
                             />
                             {errors.name && <p className="text-sm text-red-500">{errors.name}</p>}
                         </div>
 
                         {/* Jenis Lapak */}
                         <div>
-                            <label className="block mb-1 font-medium">Jenis Lapak</label>
+                            <label className="block mb-1 font-medium">Jenis Lapak<span className="text-red-500">*</span></label>
                             <select
                                 value={data.type}
                                 onChange={(e) => setData('type', e.target.value)}
@@ -162,11 +165,11 @@ export default function Edit({ marketplace, types, kelurahans, kecamatans, auth 
 
                         {/* Deskripsi */}
                         <div>
-                            <label className="block mb-1 font-medium">Deskripsi</label>
+                            <label className="block mb-1 font-medium">Deskripsi<span className="text-red-500">*</span></label>
                             <textarea
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
-                                placeholder="Deskripsikan lapak usaha kamu secara detail"
+                                placeholder="Tulis deskripsi lengkap mengenai usaha Anda, termasuk keunggulan, fitur, dan lain-lain "
                                 className="w-full min-h-[120px] px-3 py-2 text-sm border rounded"
                             />
                             {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
@@ -174,7 +177,7 @@ export default function Edit({ marketplace, types, kelurahans, kecamatans, auth 
 
                         {/* Ukuran */}
                         <div>
-                            <label className="block mb-1 font-medium">Ukuran Lapak</label>
+                            <label className="block mb-1 font-medium">Ukuran Lapak<span className="text-red-500">*</span></label>
                             <div className="flex flex-row gap-2">
                                 <input
                                     type="number"
@@ -201,7 +204,7 @@ export default function Edit({ marketplace, types, kelurahans, kecamatans, auth 
 
                         {/* Harga */}
                         <div>
-                            <label className="block mb-1 font-medium">Harga</label>
+                            <label className="block mb-1 font-medium">Harga<span className="text-red-500">*</span></label>
                             <div className="flex gap-4">
                                 <input
                                     type="number"
@@ -238,7 +241,7 @@ export default function Edit({ marketplace, types, kelurahans, kecamatans, auth 
                         {/* Kecamatan dan Kelurahan */}
                         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                             <div>
-                                <label className="block mb-1 font-medium">Kecamatan</label>
+                                <label className="block mb-1 font-medium">Kecamatan<span className="text-red-500">*</span></label>
                                 <select
                                     value={data.kecamatan}
                                     onChange={handleKecamatanChange}
@@ -254,7 +257,7 @@ export default function Edit({ marketplace, types, kelurahans, kecamatans, auth 
                                 {errors.kecamatan && <p className="text-sm text-red-500">{errors.kecamatan}</p>}
                             </div>
                             <div>
-                                <label className="block mb-1 font-medium">Kelurahan</label>
+                                <label className="block mb-1 font-medium">Kelurahan<span className="text-red-500">*</span></label>
                                 <select
                                     value={data.kelurahan}
                                     onChange={(e) => setData('kelurahan', e.target.value)}
@@ -270,6 +273,20 @@ export default function Edit({ marketplace, types, kelurahans, kecamatans, auth 
                                 </select>
                                 {errors.kelurahan && <p className="text-sm text-red-500">{errors.kelurahan}</p>}
                             </div>
+                        </div>
+
+                        {/* Nomor Telepon */}
+                        <div>
+                            <label className="block font-medium mb-1">Nomor Telepon<span className="text-red-500">*</span></label>
+                            <input 
+                                type="text" 
+                                value={data.phone_number}
+                                onChange={(e) => setData('phone_number', e.target.value)}
+                                placeholder="Masukkan nomor telepon" 
+                                className="w-full border rounded px-3 py-2" 
+                                required
+                            />
+                            {errors.phone_number && <p className="text-red-500 text-sm">{errors.phone_number}</p>}
                         </div>
 
                         {/* Alamat */}

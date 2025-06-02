@@ -1,6 +1,6 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
 import { Button } from "@/Components/ui/button";
-import { useForm } from "@inertiajs/react";
+import { useForm, Head } from "@inertiajs/react";
 import { useState } from "react";
 
 export default function Create({ types, kelurahans, kecamatans }) {
@@ -14,6 +14,7 @@ export default function Create({ types, kelurahans, kecamatans }) {
         price_type: 'monthly',
         kecamatan: '',
         kelurahan: '',
+        phone_number: '',
         address: '',
         long: '',
         lat: '',
@@ -90,6 +91,8 @@ export default function Create({ types, kelurahans, kecamatans }) {
                 </h2>
             }
         >
+            <Head title="Form Tambah Lapak"/>
+
             <div className="max-w-4xl mx-auto p-6">
                 <div className="bg-white shadow-md rounded-lg p-6 border border-black">
                     <h2 className="text-2xl font-bold mb-1">Buat Post Lapak Usaha</h2>
@@ -98,24 +101,26 @@ export default function Create({ types, kelurahans, kecamatans }) {
                     <form onSubmit={submit} className="space-y-4" encType="multipart/form-data">
                         {/* Nama Lapak */}
                         <div>
-                            <label className="block font-medium mb-1">Nama Lapak</label>
+                            <label className="block font-medium mb-1">Nama Lapak<span className="text-red-500">*</span></label>
                             <input 
                                 type="text" 
                                 value={data.name}
                                 onChange={(e) => setData('name', e.target.value)}
                                 placeholder="Masukkan nama lapak usaha" 
                                 className="w-full border rounded px-3 py-2" 
+                                required
                             />
                             {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
                         </div>
 
                         {/* Jenis Lapak */}
                         <div>
-                            <label className="block font-medium mb-1">Jenis Lapak</label>
+                            <label className="block font-medium mb-1">Jenis Lapak<span className="text-red-500">*</span></label>
                             <select 
                                 value={data.type}
                                 onChange={(e) => setData('type', e.target.value)}
                                 className="w-full text-sm border rounded px-3 py-2"
+                                required
                             >
                                 <option value="">Pilih jenis lapak</option>
                                 {types.map(({ value, label }) => (
@@ -127,23 +132,26 @@ export default function Create({ types, kelurahans, kecamatans }) {
                                     </option>
                                 ))}
                             </select>
+                            {errors.type && <p className="text-red-500 text-sm">{errors.type}</p>}
                         </div>
 
                         {/* Deskripsi */}
                         <div>
-                            <label className="block font-medium mb-1">Deskripsi</label>
+                            <label className="block font-medium mb-1">Deskripsi<span className="text-red-500">*</span></label>
                             <textarea 
                                 type="text" 
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
-                                placeholder="Deskripsikan lapak usaha kamu secara detail" 
+                                placeholder="Tulis deskripsi lengkap mengenai usaha Anda, termasuk keunggulan, fitur, dan lain-lain" 
                                 className="w-full text-sm border rounded px-3 py-2 min-h-[120px]"
+                                required
                             />
+                            {errors.description && <p className="text-red-500 text-sm">{errors.description}</p>}
                         </div>
 
                         {/* Ukuran */}
                         <div>
-                            <label className="block font-medium mb-1">Ukuran Lapak</label>
+                            <label className="block font-medium mb-1">Ukuran Lapak<span className="text-red-500">*</span></label>
                             <div className="flex flex-row gap-2">
                                 <input 
                                     type="number"
@@ -152,6 +160,8 @@ export default function Create({ types, kelurahans, kecamatans }) {
                                     onChange={e => setData('size_length', e.target.value)}
                                     placeholder="Panjang"
                                     className="w-full border rounded px-3 py-2 text-sm"
+                                    min="0"
+                                    required
                                 />
                                 <span className="text-sm self-center">
                                     meter
@@ -163,6 +173,8 @@ export default function Create({ types, kelurahans, kecamatans }) {
                                     onChange={e => setData('size_width', e.target.value)}
                                     placeholder="Lebar"
                                     className="w-full border rounded px-3 py-2 text-sm ml-2"
+                                    min="0"
+                                    required
                                 />
                                 <span className="text-sm self-center">
                                     meter
@@ -172,14 +184,16 @@ export default function Create({ types, kelurahans, kecamatans }) {
 
                         {/* Harga */}
                         <div>
-                            <label className="block font-medium mb-1">Harga</label>
+                            <label className="block font-medium mb-1">Harga<span className="text-red-500">*</span></label>
                             <div className="flex gap-4">
                                 <input 
                                     type="number"
                                     value={data.price}
                                     onChange={e => setData('price', e.target.value)}
                                     placeholder="Masukkan harga"
-                                    className="w-full border rounded px-3 text-sm" 
+                                    className="w-full border rounded px-3 text-sm"
+                                    min="0"
+                                    required
                                 />
                                 <div className="flex items-center gap-2">
                                     <input 
@@ -207,12 +221,13 @@ export default function Create({ types, kelurahans, kecamatans }) {
                         {/* Kecamatan dan Kelurahan */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block font-medium mb-1">Kecamatan</label>
+                                <label className="block font-medium mb-1">Kecamatan<span className="text-red-500">*</span></label>
                                 <select 
                                     value={data.kecamatan}
                                     // onChange={(e) => setData('kecamatan', e.target.value)}
                                     onChange={handleKecamatanChange}
                                     className="w-full text-sm border rounded px-3 py-2"
+                                    required
                                 >
                                     <option value="">Pilih kecamatan</option>
                                     {kecamatans.map(({ value, label }) => (
@@ -227,12 +242,13 @@ export default function Create({ types, kelurahans, kecamatans }) {
                                 {errors.kecamatan && <p className="text-red-500 text-sm">{errors.kecamatan}</p>}
                             </div>
                             <div>
-                                <label className="block font-medium mb-1">Kelurahan</label>
+                                <label className="block font-medium mb-1">Kelurahan<span className="text-red-500">*</span></label>
                                 <select 
                                     value={data.kelurahan}
                                     onChange={(e) => setData('kelurahan', e.target.value)}
                                     className="w-full text-sm border rounded px-3 py-2"
                                     disabled={!data.kecamatan}
+                                    required
                                 >
                                     <option value="">Pilih kelurahan</option>
                                     {availableKelurahans.map(({ value, label }) => (
@@ -247,6 +263,20 @@ export default function Create({ types, kelurahans, kecamatans }) {
                             </div>
                         </div>
 
+                        {/* Nomor Telepon */}
+                        <div>
+                            <label className="block font-medium mb-1">Nomor Telepon<span className="text-red-500">*</span></label>
+                            <input 
+                                type="text" 
+                                value={data.phone_number}
+                                onChange={(e) => setData('phone_number', e.target.value)}
+                                placeholder="Masukkan nomor telepon" 
+                                className="w-full border rounded px-3 py-2" 
+                                required
+                            />
+                            {errors.phone_number && <p className="text-red-500 text-sm">{errors.phone_number}</p>}
+                        </div>
+
                         {/* Alamat */}
                         <div>
                             <label className="block font-medium mb-1">Alamat Lengkap</label>
@@ -257,6 +287,7 @@ export default function Create({ types, kelurahans, kecamatans }) {
                                 placeholder="Masukkan alamat lengkap lapak" 
                                 className="w-full text-sm border rounded px-3 py-2" 
                             />
+                            {errors.address && <p className="text-red-500 text-sm">{errors.address}</p>}
                         </div>
 
                         {/* Lokasi Peta */}

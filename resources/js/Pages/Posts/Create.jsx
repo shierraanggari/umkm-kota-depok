@@ -1,5 +1,5 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Link, useForm } from "@inertiajs/react";
+import { Link, useForm, Head } from "@inertiajs/react";
 import { ArrowLeft,
     Send
  } from "lucide-react";
@@ -29,6 +29,8 @@ export default function Create({ community }) {
                 </h2>
             }
         >
+            <Head title="Form Buat Postingan"/>
+
             <div className="p-4">
                 {/* Tombol Back */}
                 <Link
