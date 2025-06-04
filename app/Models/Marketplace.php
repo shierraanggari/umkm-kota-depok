@@ -28,6 +28,7 @@ class Marketplace extends Model implements HasMedia
         'address',
         'long',
         'lat',
+        'status',
         'user_id'
     ];
 
@@ -55,5 +56,12 @@ class Marketplace extends Model implements HasMedia
             return ltrim(preg_replace('/[^\d+]/', '', $rawPhoneNumber), '+');
         }
         return null;
+    }
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        $this->addMediaConversion('thumb')
+             ->width(300)
+             ->height(300);
     }
 }

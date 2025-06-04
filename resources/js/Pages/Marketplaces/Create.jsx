@@ -18,6 +18,7 @@ export default function Create({ types, kelurahans, kecamatans }) {
         address: '',
         long: '',
         lat: '',
+        status: 'available',
         photos: [],
     })
 
@@ -94,7 +95,8 @@ export default function Create({ types, kelurahans, kecamatans }) {
             <Head title="Form Tambah Lapak"/>
 
             <div className="max-w-4xl mx-auto p-6">
-                <div className="bg-white shadow-md rounded-lg p-6 border border-black">
+                <div className="bg-white shadow-md rounded-lg p-6 shadow-xl">
+                    {/* border border-black"> */}
                     <h2 className="text-2xl font-bold mb-1">Buat Post Lapak Usaha</h2>
                     <p className="text-gray-500 mb-6">Isi informasi lengkap tentang lapak usaha yang ingin kamu posting</p>
 
@@ -142,7 +144,7 @@ export default function Create({ types, kelurahans, kecamatans }) {
                                 type="text" 
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
-                                placeholder="Tulis deskripsi lengkap mengenai usaha Anda, termasuk keunggulan, fitur, dan lain-lain" 
+                                placeholder="Tulis deskripsi lengkap mengenai usaha Anda, seperti keunggulan, fasilitas (air, listrik, dsb), cocok untuk apa, kondisi lingkungan, dll" 
                                 className="w-full text-sm border rounded px-3 py-2 min-h-[120px]"
                                 required
                             />
@@ -185,13 +187,13 @@ export default function Create({ types, kelurahans, kecamatans }) {
                         {/* Harga */}
                         <div>
                             <label className="block font-medium mb-1">Harga<span className="text-red-500">*</span></label>
-                            <div className="flex gap-4">
+                            <div className="flex flex-col md:flex-row gap-4">
                                 <input 
                                     type="number"
                                     value={data.price}
                                     onChange={e => setData('price', e.target.value)}
                                     placeholder="Masukkan harga"
-                                    className="w-full border rounded px-3 text-sm"
+                                    className="flex w-full border rounded px-3 text-sm"
                                     min="0"
                                     required
                                 />
@@ -214,6 +216,16 @@ export default function Create({ types, kelurahans, kecamatans }) {
                                         onChange={(e) => setData('price_type', e.target.value)}
                                     />
                                     <label>Per Tahun</label>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <input 
+                                        type="radio" 
+                                        name="priceType" 
+                                        value="other"
+                                        checked={data.price_type === 'other'}
+                                        onChange={(e) => setData('price_type', e.target.value)}
+                                    />
+                                    <label>Lainnya</label>
                                 </div>
                             </div>
                         </div>
@@ -340,9 +352,36 @@ export default function Create({ types, kelurahans, kecamatans }) {
                             </div>
                         </div>
 
+                        {/* Status */}
+                        <div>
+                            <label className="block font-medium mb-1">Status<span className="text-red-500">*</span></label>
+                            <div className="flex flex-col md:flex-row gap-4">
+                                <div className="flex items-center gap-2">
+                                    <input 
+                                        type="radio" 
+                                        name="status" 
+                                        value="available"
+                                        checked={data.status === 'available'}
+                                        onChange={(e) => setData('status', e.target.value)}
+                                    />
+                                    <label>Tersedia</label>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <input 
+                                        type="radio" 
+                                        name="status" 
+                                        value="unavailable"
+                                        checked={data.status === 'unavailable'}
+                                        onChange={(e) => setData('status', e.target.value)}
+                                    />
+                                    <label>Tidak Tersedia</label>
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Upload Foto */}
                         <div>
-                            <label htmlFor="photos" className="block mb-1 font-medium">Foto Lapak (Opsional, Maksimal 5 Foto)</label>
+                            <label htmlFor="photos" className="block mb-1 font-medium">Foto Lapak (opsional, maksimal 5 foto, ukuran maksimal 2 MB untuk setiap foto)</label>
                             <input
                                 id="photos"
                                 type="file"

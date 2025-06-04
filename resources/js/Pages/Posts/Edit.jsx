@@ -34,7 +34,7 @@ export default function Edit({ post, community }) {
             <div className="p-4">
                 {/* Tombol Back */}
                 <Link
-                    href={route('community.show', community.id)}
+                    href={route('post.show', post.id)}
                     className="flex items-center mb-6 text-sm text-gray-500 transition-colors hover:text-blue-600"
                 >
                     <ArrowLeft className="w-4 h-4 mr-1" />

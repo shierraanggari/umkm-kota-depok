@@ -14,7 +14,6 @@ const SimplePagination = ({ links, pageName = 'page' }) => {
     return (
         <nav className="flex items-center justify-center mt-6 space-x-1">
             {links.map((link, index) => {
-                // Modifikasi URL untuk menyertakan parameter halaman yang benar
                 let modifiedUrl = link.url;
                 if (modifiedUrl && pageName !== 'page') {
                     modifiedUrl = modifiedUrl.replace('?page=', `?${pageName}=`).replace('&page=', `&${pageName}=`);
@@ -28,8 +27,8 @@ const SimplePagination = ({ links, pageName = 'page' }) => {
                             ${!link.url ? 'text-gray-400 cursor-not-allowed' : ''}`}
                         dangerouslySetInnerHTML={{ __html: link.label }}
                         as={!link.url ? 'span' : 'a'}
-                        preserveScroll // Agar tidak scroll ke atas saat ganti halaman paginasi
-                        preserveState // Agar state form edit detail komunitas tidak hilang
+                        preserveScroll
+                        preserveState
                     />
                 );
             })}
@@ -103,7 +102,7 @@ export default function Edit({ community, members, banned_users, auth_user_id })
                     {recentlySuccessful && <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md text-sm">Perubahan berhasil disimpan!</div>}
                     <form onSubmit={submit} className="space-y-4">
                         <div>
-                            <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nama Komunitas</label>
+                            <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nama Komunitas<span className="text-red-500">*</span></label>
                             <input
                                 type="text"
                                 id="name"
@@ -111,10 +110,13 @@ export default function Edit({ community, members, banned_users, auth_user_id })
                                 onChange={(e) => setData('name', e.target.value)}
                                 className={`mt-1 w-full border rounded-md p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
                             />
-                            {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
+                            {/* {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>} */}
+                            {( data.name !== community.name ) && errors.name && (
+                                <p className="text-xs text-red-500 mt-1">{errors.name}</p>
+                            )}
                         </div>
                         <div>
-                            <label htmlFor="description" className="block text-sm font-medium text-gray-700">Deskripsi</label>
+                            <label htmlFor="description" className="block text-sm font-medium text-gray-700">Deskripsi<span className="text-red-500">*</span></label>
                             <textarea
                                 id="description"
                                 value={data.description}

@@ -19,6 +19,7 @@ export default function Edit({ marketplace, types, kelurahans, kecamatans, auth 
         address: marketplace.address || '',
         long: marketplace.long || '',
         lat: marketplace.lat || '',
+        status: marketplace.status || 'available',
         photos: [], // Untuk file baru yang akan diupload
         deleted_photos: [], // Untuk ID foto lama yang akan dihapus
     });
@@ -127,7 +128,7 @@ export default function Edit({ marketplace, types, kelurahans, kecamatans, auth 
             <Head title="Form Edit Lapak"/>
 
             <div className="max-w-4xl p-6 mx-auto">
-                <div className="p-6 bg-white border border-black rounded-lg shadow-md">
+                <div className="p-6 bg-white rounded-lg shadow-xl">
                     <h2 className="mb-1 text-2xl font-bold">Edit Post Lapak Usaha</h2>
                     <p className="mb-6 text-gray-500">Ubah data lapak usaha</p>
 
@@ -169,7 +170,7 @@ export default function Edit({ marketplace, types, kelurahans, kecamatans, auth 
                             <textarea
                                 value={data.description}
                                 onChange={(e) => setData('description', e.target.value)}
-                                placeholder="Tulis deskripsi lengkap mengenai usaha Anda, termasuk keunggulan, fitur, dan lain-lain "
+                                placeholder="Tulis deskripsi lengkap mengenai usaha Anda, seperti keunggulan, fasilitas (air, listrik, dsb), cocok untuk apa, kondisi lingkungan, dll"
                                 className="w-full min-h-[120px] px-3 py-2 text-sm border rounded"
                             />
                             {errors.description && <p className="text-sm text-red-500">{errors.description}</p>}
@@ -205,18 +206,20 @@ export default function Edit({ marketplace, types, kelurahans, kecamatans, auth 
                         {/* Harga */}
                         <div>
                             <label className="block mb-1 font-medium">Harga<span className="text-red-500">*</span></label>
-                            <div className="flex gap-4">
-                                <input
+                            <div className="flex flex-col md:flex-row gap-4">
+                                <input 
                                     type="number"
                                     value={data.price}
                                     onChange={e => setData('price', e.target.value)}
                                     placeholder="Masukkan harga"
-                                    className="w-full px-3 text-sm border rounded"
+                                    className="flex w-full border rounded px-3 text-sm"
+                                    min="0"
+                                    required
                                 />
                                 <div className="flex items-center gap-2">
-                                    <input
-                                        type="radio"
-                                        name="priceType"
+                                    <input 
+                                        type="radio" 
+                                        name="priceType" 
                                         value="monthly"
                                         checked={data.price_type === 'monthly'}
                                         onChange={(e) => setData('price_type', e.target.value)}
@@ -224,14 +227,24 @@ export default function Edit({ marketplace, types, kelurahans, kecamatans, auth 
                                     <label>Per Bulan</label>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <input
-                                        type="radio"
-                                        name="priceType"
+                                    <input 
+                                        type="radio" 
+                                        name="priceType" 
                                         value="yearly"
                                         checked={data.price_type === 'yearly'}
                                         onChange={(e) => setData('price_type', e.target.value)}
                                     />
                                     <label>Per Tahun</label>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <input 
+                                        type="radio" 
+                                        name="priceType" 
+                                        value="other"
+                                        checked={data.price_type === 'other'}
+                                        onChange={(e) => setData('price_type', e.target.value)}
+                                    />
+                                    <label>Lainnya</label>
                                 </div>
                             </div>
                             {errors.price && <p className="text-sm text-red-500">{errors.price}</p>}
@@ -353,9 +366,36 @@ export default function Edit({ marketplace, types, kelurahans, kecamatans, auth 
                             </div>
                         </div>
 
+                        {/* Status */}
+                        <div>
+                            <label className="block font-medium mb-1">Status<span className="text-red-500">*</span></label>
+                            <div className="flex flex-col md:flex-row gap-4">
+                                <div className="flex items-center gap-2">
+                                    <input 
+                                        type="radio" 
+                                        name="status" 
+                                        value="available"
+                                        checked={data.status === 'available'}
+                                        onChange={(e) => setData('status', e.target.value)}
+                                    />
+                                    <label>Tersedia</label>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <input 
+                                        type="radio" 
+                                        name="status" 
+                                        value="unavailable"
+                                        checked={data.status === 'unavailable'}
+                                        onChange={(e) => setData('status', e.target.value)}
+                                    />
+                                    <label>Tidak Tersedia</label>
+                                </div>
+                            </div>
+                        </div>
+
                         {/* Upload Foto */}
                         <div>
-                            <label className="block mb-1 font-medium">Foto Lapak (Maksimal 5 Foto)</label>
+                            <label className="block mb-1 font-medium">Foto Lapak (opsional, maksimal 5 foto, ukuran maksimal 2 MB untuk setiap foto)</label>
                             
                             {/* Foto Lama */}
                             {marketplace.photos && marketplace.photos.length > 0 && (

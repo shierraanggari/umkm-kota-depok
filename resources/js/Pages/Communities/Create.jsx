@@ -30,7 +30,7 @@ export default function Create() {
                     <form onSubmit={submit} className="flex flex-col gap-4">
                         <div>
                             <label htmlFor="title" className="block text-md font-medium text-gray-700">
-                                Nama Komunitas
+                                Nama Komunitas<span className="text-red-500">*</span>
                             </label>
                             <input
                                 type="text" 
@@ -46,7 +46,7 @@ export default function Create() {
                         </div>
                         <div>
                             <label htmlFor="body" className="block text-md font-medium text-gray-700">
-                                Deskripsi
+                                Deskripsi<span className="text-red-500">*</span>
                             </label>
                             <textarea
                                 type="text" 

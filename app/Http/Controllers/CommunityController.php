@@ -15,7 +15,7 @@ class CommunityController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware('permission:community index', only: ['index', 'show']),
+            // new Middleware('permission:community index', only: ['index', 'show']),
             new Middleware('permission:community create', only: ['create', 'store']),
             new Middleware('permission:community edit', only: ['edit', 'update']),
             new Middleware('permission:community delete', only: ['destroy']),
@@ -23,11 +23,31 @@ class CommunityController extends Controller implements HasMiddleware
         ];
     }
     
-    public function index()
+    public function index(Request $request)
     {
         $query = Community::query()
             ->withCount(['members', 'posts']) 
             ->with('creator:id,name');  
+            
+        // Filter
+        $search = $request->input('search');
+        $sortBy = $request->input('sort_by', 'newest');
+
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('description', 'like', '%' . $search . '%');
+            });
+        }
+
+        if ($sortBy === 'most_members') {
+            $query->orderByDesc('members_count');
+        } elseif ($sortBy === 'most_posts') {
+            $query->orderByDesc('posts_count');
+        } else {
+            $query->latest();
+        }
+
         
         if (auth()->check()) {
             $currentUserId = auth()->id();
@@ -40,6 +60,7 @@ class CommunityController extends Controller implements HasMiddleware
         return inertia('Communities/Index', [
             'communities' => $communities,
             'auth_user_id' => auth()->id(),
+            'filters' => $request->only(['search', 'sort_by']),
         ]);
     }
 

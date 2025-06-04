@@ -170,19 +170,19 @@ export default function Show({ marketplace, photos, auth_user_id }) {
               <div className="space-y-2 text-sm text-gray-700">
                 <div className="flex items-center">
                   <Factory className="w-4 h-4 stroke-1 mr-2"/>
-                  Tipe: <span className="ml-auto font-medium">{marketplace.type}</span>
+                  Tipe: <span className="ml-auto font-medium text-right">{marketplace.type}</span>
                 </div>
                 <div className="flex items-center">
                   <Ruler className="w-4 h-4 stroke-1 mr-2"/>
-                  Ukuran: <span className="ml-auto font-medium">{+marketplace.size_length} × {+marketplace.size_width} m²</span>
+                  Ukuran: <span className="ml-auto font-medium text-right">{+marketplace.size_length} × {+marketplace.size_width} m²</span>
                 </div>
                 <div className="flex items-center">
                   <Calendar className="w-4 h-4 stroke-1 mr-2"/>
-                  Diunggah pada: <span className="ml-auto font-medium">{formatDate(marketplace.created_at)}</span>
+                  Diunggah pada: <span className="ml-auto font-medium text-right">{formatDate(marketplace.created_at)}</span>
                 </div>
                 <div className="flex items-center">
                   <Calendar className="w-4 h-4 stroke-1 mr-2"/>
-                  Diperbarui pada: <span className="ml-auto font-medium">{formatDate(marketplace.updated_at)}</span>
+                  Diperbarui pada: <span className="ml-auto font-medium text-right">{formatDate(marketplace.updated_at)}</span>
                 </div>
               </div>              
             </div>

@@ -1,13 +1,15 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Button } from '@/Components/ui/button';
-import { Link, usePage, Head } from '@inertiajs/react';
+import { Link, usePage, Head, router } from '@inertiajs/react';
 import hasAnyPermission from '@/Utils/Permission';
 import { Users, 
     MessageSquare, 
     Eye, 
     PlusCircle, 
     Search,
-    CheckCircle } from 'lucide-react';
+    CheckCircle,
+    RotateCcw } from 'lucide-react';
+import { useState, useEffect } from 'react';
 
 const SimplePagination = ({ links }) => {
     if (!links || links.length <= 3) return null;
@@ -28,11 +30,53 @@ const SimplePagination = ({ links }) => {
             ))}
         </nav>
     );
-};
+};    
 
-export default function Index({ communities, auth_user_id }) {
+export default function Index({ communities, auth_user_id, filters: initialFiltersProp }) {
     const { props: pageProps } = usePage();
     const permission = pageProps.permission || {};
+
+    // State untuk filter, diinisialisasi dengan nilai dari props atau default
+    const [filters, setFilters] = useState({
+        search: initialFiltersProp?.search || '',
+        sortBy: initialFiltersProp?.sortBy || '',
+    });
+
+    // Update state filter lokal jika props filter dari controller berubah
+    useEffect(() => {
+        setFilters({
+            search: initialFiltersProp?.search || '',
+            sortBy: initialFiltersProp?.sortBy || '',
+        });
+    }, [initialFiltersProp]);
+
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setFilters(prevFilters => {
+            const updatedFilters = { ...prevFilters, [name]: value };
+            return updatedFilters;
+        });
+    };
+
+    const applyFilters = () => {
+        router.get(route('community.index'), filters, {
+            preserveScroll: true,
+            preserveState: true, // Agar input filter tidak hilang
+            replace: true // Agar tidak menambah history browser untuk setiap filter
+        });
+    };
+
+    const resetFilters = () => {
+        const defaultFilters = {
+            search: '', sortBy: '',
+        };
+        setFilters(defaultFilters);
+        router.get(route('community.index'), defaultFilters, {
+            preserveScroll: true,
+            preserveState: true,
+            replace: true
+        });
+    };
 
     return (
         <AuthenticatedLayout
@@ -48,27 +92,31 @@ export default function Index({ communities, auth_user_id }) {
             <div className="px-4 py-6 sm:px-6 lg:px-8">
                 
                 <div className="p-6 mb-6 bg-white border border-gray-300 rounded-lg shadow-sm">
-                    <div className="flex items-center mb-4">
-                        <Search className="w-5 h-5 mr-2 text-gray-600" />
-                        <h2 className="text-xl font-semibold text-gray-800">Filter Komunitas</h2>
-                    </div>
-                    <div className="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2 lg:grid-cols-4">
-                        <input type="text" placeholder="Cari nama komunitas..." className="p-2 text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" />
-                        
-                        <select className="p-2 text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Semua Kategori (Contoh)</option>
-                            <option>Teknologi</option>
-                            <option>Bisnis</option>
+                    <h2 className="mb-4 text-xl font-semibold">Filter Komunitas</h2>
+                    <div className="grid grid-cols-1 gap-4 mb-4 sm:grid-cols-2 md:grid-cols-4">
+                        <input
+                            type="text"
+                            name="search"
+                            placeholder="Cari nama atau deskripsi..."
+                            value={filters.search}
+                            onChange={handleFilterChange}
+                            className="p-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                        />
+                        <select
+                            name="sort_by"
+                            value={filters.sort_by}
+                            onChange={handleFilterChange}
+                            className="p-2 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                        >
+                            <option value="newest">Terbaru</option>
+                            <option value="most_members">Anggota Terbanyak</option>
+                            <option value="most_posts">Postingan Terbanyak</option>
                         </select>
-                        <select className="p-2 text-sm border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Urutkan (Contoh)</option>
-                            <option>Terbaru</option>
-                            <option>Terpopuler</option>
-                        </select>
-                        <Button variant="outline" className="lg:col-start-4"> 
-                            Terapkan Filter
-                        </Button>
+                        <Button onClick={applyFilters}>Terapkan Filter</Button>
+                        <Button onClick={resetFilters} variant="outline"><RotateCcw size={16} className="mr-2" /> Reset Filter</Button>
                     </div>
+                    {/* <div className="flex items-center space-x-2"> */}
+                    {/* </div> */}
                 </div>
 
                 {/* Button Tambah */}

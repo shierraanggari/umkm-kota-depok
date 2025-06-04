@@ -72,7 +72,8 @@ export default function Show({ community, posts, isMember, isCreator, isAdmin}) 
 
                 {/* Tentang Komunitas */}
                 <div className="p-4 border rounded-md shadow-sm bg-white">
-                    <h2 className="text-lg font-semibold mb-2">Tentang Komunitas</h2>
+                    <h2 className="text-lg font-medium mb-2">Tentang Komunitas</h2>
+                    <h2 className="text-lg font-bold mb-2">{community.name}</h2>
                     <p className="text-gray-800 mb-4">
                         {community.description}
                     </p>
