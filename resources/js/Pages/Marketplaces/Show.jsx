@@ -11,7 +11,8 @@ import {
   Factory,
   MapPinned,
   Globe,
-  MessageCircle
+  MessageCircle,
+  MapPin
 } from 'lucide-react'
 import { useState, useEffect } from 'react';
 import { Button } from '@/Components/ui/button';
@@ -34,7 +35,56 @@ const formatDate = (dateString) => {
     }).format(date);
 };
 
-export default function Show({ marketplace, photos, auth_user_id }) {
+const RecommendationItemCard = ({ item }) => {
+  return (
+    // <Link href={item.link} className="block group border border-gray-200 rounded-lg overflow-hidden shadow hover:shadow-md transition-shadow bg-white">
+      <div className="flex flex-col content-between bg-white border border-gray-300 rounded-lg shadow-sm overflow-hidden">
+        <div className="flex items-center justify-center rounded-md w-full h-48 bg-gray-200">
+            {item.photo_url ? (
+                <img src={item.photo_url} alt={item.name} className="rounded-md object-cover w-full h-full" />
+            ) : (
+                <div className="flex flex-col rounded-lg items-center text-gray-500">
+                    <ImageOff size={48} strokeWidth={1.5}/>
+                    <span className="mt-2 text-sm">Belum ada foto</span>
+                </div>
+            )}
+        </div>
+        <div className="p-4 space-y-2">
+            {item.status === 'available' ? (
+                <div className="flex w-fit items-center text-center justify-center px-2 py-1 text-sm font-medium text-green-700 bg-green-100 border border-green-300 rounded-full">
+                    Tersedia
+                </div>
+            ) : <div className="flex w-fit items-center text-center justify-center px-2 py-1 text-sm font-medium text-red-700 bg-red-100 border border-red-300 rounded-full">
+                    Tidak Tersedia
+                </div>
+            }
+            <p className="font-medium text-sm truncate">{item.name}</p>
+            <p className="font-bold text-xl">
+                {item.price_formatted}
+                {item.price_type === 'monthly' ? '/bulan' : '/tahun'}
+            </p>
+            <p className="text-sm text-gray-400 mb-2">{item.location}</p>
+            <p className="flex text-sm mb-4">
+                <MapPin className="w-5 h-5 mr-1"/>{item.kelurahan_label}, {item.kecamatan_label}
+            </p>
+            <div className="flex justify-between text-sm font-medium text-gray-700 mb-4">
+                <span className="flex"><Factory className="w-5 h-5 mr-1"/>{item.type_label}</span>
+                <span className="flex"><Ruler className="w-5 h-5 mr-1"/>{+item.size_length} x {+item.size_width} meter</span>
+            </div>
+            <div className="flex flex-col">
+                <Link href={route('marketplace.show', item.id)} className="flex-1">
+                    <Button className="mt-2 w-full">
+                        Lihat Detail
+                    </Button>
+                </Link>
+            </div>
+        </div>
+    </div>
+    // </Link>
+  );
+};
+
+export default function Show({ marketplace, photos, auth_user_id, recommended_marketplaces, recommendation_error }) {
   const userPhotoUrl = marketplace.user?.profile_photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(marketplace.user?.name || 'User')}&color=7F9CF5&background=EBF4FF`;
 
   const [selectedImage, setSelectedImage] = useState('');
@@ -139,7 +189,7 @@ export default function Show({ marketplace, photos, auth_user_id }) {
                   <svg className="w-4 h-4 mr-1.5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path d="M12 2C8.134 2 5 5.134 5 9c0 6.075 7 13 7 13s7-6.925 7-13c0-3.866-3.134-7-7-7zM12 11a2 2 0 100-4 2 2 0 000 4z"/>
                   </svg>
-                  {marketplace.kelurahan}, {marketplace.kecamatan}
+                  {marketplace.kelurahan_label}, {marketplace.kecamatan_label}
                 </div>
               </div>
               
@@ -170,7 +220,7 @@ export default function Show({ marketplace, photos, auth_user_id }) {
               <div className="space-y-2 text-sm text-gray-700">
                 <div className="flex items-center">
                   <Factory className="w-4 h-4 stroke-1 mr-2"/>
-                  Tipe: <span className="ml-auto font-medium text-right">{marketplace.type}</span>
+                  Tipe: <span className="ml-auto font-medium text-right">{marketplace.type_label}</span>
                 </div>
                 <div className="flex items-center">
                   <Ruler className="w-4 h-4 stroke-1 mr-2"/>
@@ -269,6 +319,27 @@ export default function Show({ marketplace, photos, auth_user_id }) {
               <p className="text-sm text-gray-500 italic">Pengguna ini tidak menyertakan titik peta.</p>
             )}
           </section>
+
+          {recommended_marketplaces && recommended_marketplaces.length > 0 && (
+            <div className="mt-10 pt-6 border-t border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                {/* <ThumbsUp className="w-5 h-5 mr-2 text-blue-600" /> Jika Anda menggunakan lucide-react */}
+                <span>Lapak Lain yang Mungkin Anda Suka</span>
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {recommended_marketplaces.map((rec_item) => (
+                  <RecommendationItemCard key={rec_item.id} item={rec_item} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {recommendation_error && ! (recommended_marketplaces && recommended_marketplaces.length > 0) && (
+            <div className="mt-10 p-3 bg-yellow-50 border border-yellow-300 text-yellow-700 rounded-md text-sm">
+              <p>{recommendation_error}</p>
+            </div>
+          )}
+          
         </div>
 
         <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
