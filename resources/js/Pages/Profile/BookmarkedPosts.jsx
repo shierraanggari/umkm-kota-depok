@@ -84,7 +84,7 @@ export default function BookmarkedPosts({ auth, posts }) {
                     ) : (
                         <div className="p-8 mt-6 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
                             <MessageSquare size={48} className="mx-auto mb-4 text-gray-400" />
-                            <p className="text-lg font-semibold text-gray-700">Anda belum membuat postingan apapun.</p>
+                            <p className="text-lg font-semibold text-gray-700">Anda belum menyimpan postingan apapun.</p>
                         </div>
                     )}
                 </div>
