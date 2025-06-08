@@ -206,24 +206,22 @@ class MarketplaceController extends Controller implements HasMiddleware
     {
         $marketplace->load('user');
 
-        // --- Memanggil API Flask untuk Rekomendasi ---
         $recommendedMarketplaceIds = [];
-        $userFriendlyRecommendationError = null; // Pesan error untuk ditampilkan ke user
+        $userFriendlyRecommendationError = null;
 
-        // Siapkan data lapak saat ini untuk dikirim ke API Python/Flask
         $currentItemDataForPython = [
             'id' => (string)$marketplace->id,
             'name' => $marketplace->name,
-            'description_raw' => $marketplace->description, // Gunakan field deskripsi yang relevan
+            'description_raw' => $marketplace->description,
             'type_label' => MarketplaceType::labels()[$marketplace->type] ?? $marketplace->getRawOriginal('type'),
             'kecamatan_label' => Kecamatan::labels()[$marketplace->kecamatan] ?? $marketplace->getRawOriginal('kecamatan'),
+            'kelurahan_label' => Kelurahan::labels()[$marketplace->kelurahan] ?? $marketplace->getRawOriginal('kelurahan'),
             'price_raw' => $marketplace->getRawOriginal('price') ?? $marketplace->price,
         ];
 
-        // Ambil data lapak lain (Anda bisa menentukan jumlah atau kriteria lain di sini)
         $allOtherMarketplacesFromDB = Marketplace::where('id', '!=', $marketplace->id)
-            ->select(['id', 'name', 'description', 'type', 'kecamatan', 'price']) // Kolom relevan
-            // ->take(50) // Contoh: batasi jumlah data yang dikirim jika sangat banyak
+            ->select(['id', 'name', 'description', 'type', 'kecamatan', 'kelurahan', 'price'])
+            // ->take(50)
             ->get();
 
         $allOtherMarketplacesForPython = $allOtherMarketplacesFromDB
@@ -241,7 +239,7 @@ class MarketplaceController extends Controller implements HasMiddleware
             ->values()
             ->toArray();
 
-        $topN = 5; // Jumlah rekomendasi yang diinginkan
+        $topN = 5;
 
         if (count($allOtherMarketplacesForPython) > 0) {
             $payload = [
@@ -249,21 +247,23 @@ class MarketplaceController extends Controller implements HasMiddleware
                 'all_other_lapaks' => $allOtherMarketplacesForPython,
                 'top_n' => $topN
             ];
-
-            // Ambil URL API Flask dari environment variable untuk fleksibilitas
+            
             $flaskApiUrl = env('FLASK_RECOMMENDER_API_URL', 'http://127.0.0.1:5001/recommend');
 
             try {
-                $response = Http::timeout(30) // Timeout request (dalam detik)
-                                  ->post($flaskApiUrl, $payload);
+                $response = Http::timeout(30)->post($flaskApiUrl, $payload);
 
                 if ($response->successful()) {
                     $responseData = $response->json();
                     if (isset($responseData['recommendations']) && is_array($responseData['recommendations'])) {
-                        $recommendedMarketplaceIds = $responseData['recommendations'];
-                        if (!empty($responseData['error'])) { // Jika API Flask mengirim pesan error
+                        if (isset($responseData['recommendations'][0]) && is_array($responseData['recommendations'][0])) {
+                            $recommendedMarketplaceIds = array_column($responseData['recommendations'], 'id');
+                        } else {
+                            $recommendedMarketplaceIds = $responseData['recommendations'];
+                        }
+
+                        if (!empty($responseData['error'])) {
                             Log::warning('Pesan error dari Flask API: ' . $responseData['error']);
-                            // Anda bisa memilih untuk tidak menampilkan error ini ke user jika tidak kritis
                         }
                     } else {
                         $userFriendlyRecommendationError = "Format respons rekomendasi tidak sesuai.";
@@ -276,7 +276,7 @@ class MarketplaceController extends Controller implements HasMiddleware
             } catch (\Illuminate\Http\Client\ConnectionException $e) {
                 $userFriendlyRecommendationError = "Tidak dapat terhubung ke sistem rekomendasi.";
                 Log::critical('Flask API ConnectionException: ' . $e->getMessage());
-            } catch (\Throwable $e) { // Menangkap error PHP lain saat proses request
+            } catch (\Throwable $e) {
                 $userFriendlyRecommendationError = "Terjadi kesalahan saat memproses rekomendasi.";
                 Log::error('Throwable saat memanggil Flask API: ' . $e->getMessage());
             }
@@ -284,13 +284,17 @@ class MarketplaceController extends Controller implements HasMiddleware
             $userFriendlyRecommendationError = "Belum ada cukup data untuk rekomendasi.";
         }
 
-        // --- Mengambil Detail Lapak yang Direkomendasikan ---
         $recommendedMarketplacesData = collect();
-        if (!empty($recommendedMarketplaceIds)) {
+        if (!empty($recommendedMarketplaceIds) && is_array($recommendedMarketplaceIds) && count($recommendedMarketplaceIds) === count(array_filter($recommendedMarketplaceIds, 'is_scalar'))) {
             $recommendedMarketplacesData = Marketplace::with(['media'])
                 ->whereIn('id', $recommendedMarketplaceIds)
                 ->take($topN)
                 ->get()
+                ->keyBy('id')
+                ->sortBy(function ($model, $key) use ($recommendedMarketplaceIds) {
+                    return array_search((string)$key, $recommendedMarketplaceIds);
+                })
+                ->values()
                 ->map(function ($recLapak) {
                     return [
                         'id' => $recLapak->id,
@@ -298,22 +302,22 @@ class MarketplaceController extends Controller implements HasMiddleware
                         'status' => $recLapak->status,
                         'size_length' => $recLapak->size_length,
                         'size_width' => $recLapak->size_width,
-                        'price_formatted' => Number::currency($recLapak->price, 'IDR', 'id_ID'),
-                        'photo_url' => $recLapak->getFirstMediaUrl('photos'),
+                        'price_formatted' => is_numeric($recLapak->price) ? Number::currency($recLapak->price, 'IDR', 'id_ID') : 'N/A',
+                        'photo_url' => $recLapak->getFirstMediaUrl('photos', 'thumb'),
                         'link' => route('marketplace.show', $recLapak->id),
                         'type_label' => MarketplaceType::labels()[$recLapak->type] ?? $recLapak->type,
                         'kelurahan_label' => Kelurahan::labels()[$recLapak->kelurahan] ?? $recLapak->kelurahan,
                         'kecamatan_label' => Kecamatan::labels()[$recLapak->kecamatan] ?? $recLapak->kecamatan,
-                        'type_label' => MarketplaceType::labels()[$recLapak->type] ?? $recLapak->type,
                     ];
                 });
         }
 
-        // --- Formatting Data Lapak Utama (dari kode awal Anda) ---
-        $marketplace->price = Number::currency($marketplace->price, 'IDR', 'id_ID'); // Perhatikan ini menimpa $marketplace->price
-        $marketplace->kecamatan_label = Kecamatan::labels()[$marketplace->kecamatan] ?? $marketplace->kecamatan;
-        $marketplace->kelurahan_label = Kelurahan::labels()[$marketplace->kelurahan] ?? $marketplace->kelurahan;
-        $marketplace->type_label = MarketplaceType::labels()[$marketplace->type] ?? $marketplace->type;
+        $marketplaceForView = $marketplace->toArray();
+        $marketplaceForView['price_formatted'] = Number::currency($marketplace->price, 'IDR', 'id_ID');
+        $marketplaceForView['kecamatan_label'] = Kecamatan::labels()[$marketplace->kecamatan] ?? $marketplace->kecamatan;
+        $marketplaceForView['kelurahan_label'] = Kelurahan::labels()[$marketplace->kelurahan] ?? $marketplace->kelurahan;
+        $marketplaceForView['type_label'] = MarketplaceType::labels()[$marketplace->type] ?? $marketplace->type;
+        $marketplaceForView['user'] = $marketplace->user;
         
         $photos = $marketplace->getMedia('photos')->map(function ($media) {
             return [
@@ -322,19 +326,12 @@ class MarketplaceController extends Controller implements HasMiddleware
             ];
         })->toArray();
 
-        // --- Mengirim Data ke View Inertia ---
         return inertia('Marketplaces/Show', [
-            'marketplace' => $marketplace->toArray() + [ // Gabungkan atribut yang baru diformat
-                // 'price' sudah diformat di atas
-                'kecamatan_label' => $marketplace->kecamatan_label,
-                'kelurahan_label' => $marketplace->kelurahan_label,
-                'type_label' => $marketplace->type_label,
-                'user' => $marketplace->user // Pastikan relasi user sudah di-load
-            ],
+            'marketplace' => $marketplaceForView,
             'photos' => $photos,
             'auth_user_id' => auth()->id(),
             'recommended_marketplaces' => $recommendedMarketplacesData,
-            'recommendation_error' => $userFriendlyRecommendationError, // Pesan error yang lebih ramah
+            'recommendation_error' => $userFriendlyRecommendationError,
         ]);
     }
 

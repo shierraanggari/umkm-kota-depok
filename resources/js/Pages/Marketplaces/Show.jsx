@@ -215,7 +215,7 @@ export default function Show({ marketplace, photos, auth_user_id, recommended_ma
           {/* Detail */}
           <div className="space-y-6">
             <div className="bg-white text-black rounded-xl p-6 shadow-sm">
-              <div className="text-3xl font-bold mb-2">{marketplace.price}</div>
+              <div className="text-3xl font-bold mb-2">{marketplace.price_formatted}</div>
               <div className="text-sm text-gray-500 mb-4">{marketplace.price_type === 'monthly' ? 'per bulan' : 'per tahun'}</div>
               <div className="space-y-2 text-sm text-gray-700">
                 <div className="flex items-center">

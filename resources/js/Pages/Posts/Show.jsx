@@ -36,7 +36,7 @@ const formatTimestamp = (dateString) => {
 };
 
 const CommentItem = ({ comment, currentUserId, onLikeComment, onDeleteComment /*, onEditComment */ }) => {
-    const canEditOrDelete = currentUserId === comment.user_id;
+    const canEditOrDelete = (currentUserId === comment.user_id || currentUserId === 1);
 
     return (
         <div className="flex items-start space-x-3 py-3 border-b border-gray-200 last:border-b-0">
@@ -53,7 +53,7 @@ const CommentItem = ({ comment, currentUserId, onLikeComment, onDeleteComment /*
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                         <span className="text-sm font-semibold text-gray-800">{comment.user ? comment.user.name : 'User Anonim'}</span>
-                        {/* Menggunakan fungsi format tanggal baru */}
+                        
                         <span className="text-xs text-gray-500">• {formatTimestamp(comment.created_at)}</span>
                     </div>
                     {canEditOrDelete && (

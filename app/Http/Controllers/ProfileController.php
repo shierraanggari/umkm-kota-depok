@@ -70,24 +70,14 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 
-    public function destroyPhoto(Request $request): RedirectResponse // Nama method bisa destroyPhoto atau deletePhoto
+    public function destroyPhoto(Request $request): RedirectResponse
     {
         $user = Auth::user();
 
-        // Jika menggunakan Spatie Media Library
         if ($user->hasMedia('profile_photos')) {
-            $user->clearMediaCollection('profile_photos'); // Menghapus semua media di koleksi ini
+            $user->clearMediaCollection('profile_photos');
         }
 
-        // Jika Anda menyimpan path manual di kolom 'profile_photo_path'
-        // if ($user->profile_photo_path) {
-        //     Storage::disk('public')->delete($user->profile_photo_path);
-        //     $user->profile_photo_path = null;
-        //     $user->save();
-        // }
-        
         return back(303)->with('success', 'Foto profil berhasil dihapus.');
-        // Atau redirect ke halaman edit profil
-        // return Redirect::route('profile.edit')->with('success', 'Foto profil berhasil dihapus.');
     }
 }
