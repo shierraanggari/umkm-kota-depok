@@ -26,7 +26,7 @@ return new class extends Migration
             $table->string('phone_number')->nullable();
             $table->string('long')->nullable();
             $table->string('lat')->nullable();
-            $table->enum('price_type', ['available','unavailable'])->default('available');
+            $table->enum('status', ['available','unavailable'])->default('available');
             $table->foreignId('user_id')->nullable()->constrained('users')->onUpdate('cascade')->onDelete('set null');
             $table->timestamps(); // created_at, updated_at
         });
