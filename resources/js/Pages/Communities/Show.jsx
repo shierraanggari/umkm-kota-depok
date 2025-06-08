@@ -75,7 +75,7 @@ export default function Show({ community, posts, isMember, isCreator, isAdmin, i
                 <div className="p-4 border rounded-md shadow-sm bg-white">
                     <h2 className="text-lg font-medium mb-2">Tentang Komunitas</h2>
                     <h2 className="text-lg font-bold mb-2">{community.name}</h2>
-                    <p className="text-gray-800 mb-4">
+                    <p className="text-gray-800 mb-4 whitespace-pre-wrap">
                         {community.description}
                     </p>
                     <div className="flex justify-between items-center text-sm text-gray-600">
