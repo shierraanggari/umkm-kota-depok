@@ -6,7 +6,8 @@ import { Settings,
     PlusCircle,
     ThumbsUp,
     User,
-    ArrowLeft
+    ArrowLeft,
+    CircleX
  } from "lucide-react";
 
 const formatDate = (dateString) => {
@@ -39,7 +40,7 @@ const SimplePagination = ({ links }) => {
     );
 };
 
-export default function Show({ community, posts, isMember, isCreator, isAdmin}) {
+export default function Show({ community, posts, isMember, isCreator, isAdmin, isBanned }) {
     // const userPhotoUrl = post.user?.profile_photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user?.name || 'User')}&color=7F9CF5&background=EBF4FF`;
 
     const handleJoinCommunity = () => {
@@ -102,12 +103,12 @@ export default function Show({ community, posts, isMember, isCreator, isAdmin}) 
                             Keluar Komunitas
                         </Button>
                     )}
-                    {!isMember && (
+                    {!isMember && (!isBanned) && (
                         <Button onClick={handleJoinCommunity} className="flex items-center w-full md:w-fit">
                             Gabung Komunitas
                         </Button>
                     )}
-                    {(isMember || isAdmin || isCreator) && (
+                    {(isMember || isAdmin || isCreator) && (!isBanned) && (
                         <Link href={route('post.create', { community_id: community.id })}>
                             <Button className="flex items-center w-full md:w-fit">
                                 <PlusCircle className="w-4 h-4 mr-2" />
@@ -120,50 +121,57 @@ export default function Show({ community, posts, isMember, isCreator, isAdmin}) 
                 {/* Postingan */}
                 <div className="mt-2">
                     {posts.data && posts.data.length > 0 ? (
-                        <div className="space-y-6">
-                            {posts.data.map((post) => (
-                                <div key={post.id} className="p-5 bg-white border border-gray-200 rounded-lg shadow-sm transition-shadow hover:shadow-md">
-                                    <div className="flex items-start mb-3 space-x-3">
-                                        {/* Avatar */}
-                                        <img src={post.user?.profile_photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user?.name || 'User')}&color=7F9CF5&background=EBF4FF`}
-                                            alt={post.user?.name || 'User Avatar'}
-                                            className="w-10 h-10 rounded-full object-cover"
-                                        />
-                                        {/* <div className="flex-shrink-0 w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 text-lg font-semibold">
-                                            {post.user ? post.user.name.charAt(0).toUpperCase() : '?'}
-                                        </div> */}
-                                        <div>
-                                            <p className="text-sm font-semibold text-gray-900">{post.user ? post.user.name : 'User Anonim'}</p>
-                                            <p className="text-xs text-gray-500">{formatDate(post.created_at)}</p>
-                                        </div>
-                                    </div>
-
-                                    <h3 className="mb-2 text-xl font-bold text-gray-800 hover:text-blue-600">                                        
-                                        <Link href={route('post.show', post.id)}>
-                                            {post.name}
-                                        </Link>
-                                    </h3>
-
-                                    <p className="mb-4 text-sm leading-relaxed text-gray-700 line-clamp-3">{post.description}</p>
-                                    <div className="flex items-center justify-between text-sm text-gray-500">
-                                        <div className="flex items-center space-x-4">
-                                            <span className="flex items-center">
-                                                <ThumbsUp className="w-4 h-4 mr-1" /> {post.likers_count}
-                                            </span>
-                                            <span className="flex items-center">
-                                                <MessageSquare className="w-4 h-4 mr-1" /> {post.comments_count}
-                                            </span>
-                                        </div>
-                                        <Link
-                                            href={route('post.show', post.id)}
-                                            className="font-medium text-blue-600 hover:text-blue-700">
-                                            Lihat Selengkapnya
-                                        </Link>
-                                    </div>
-                                </div>
-                            ))}
-                            <SimplePagination links={posts.links} /> {/* Paginasi untuk postingan */}
+                        ( isBanned ? (
+                            <div className="p-8 mt-6 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
+                            <CircleX size={48} className="mx-auto mb-4 text-red-500" />
+                            <p className="text-lg font-semibold text-gray-700">Anda telah di-ban dan tidak dapat melihat konten dari komunitas ini  .</p>
                         </div>
+                        ) : (
+                            <div className="space-y-6">
+                                {posts.data.map((post) => (
+                                    <div key={post.id} className="p-5 bg-white border border-gray-200 rounded-lg shadow-sm transition-shadow hover:shadow-md">
+                                        <div className="flex items-start mb-3 space-x-3">
+                                            {/* Avatar */}
+                                            <img src={post.user?.profile_photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.user?.name || 'User')}&color=7F9CF5&background=EBF4FF`}
+                                                alt={post.user?.name || 'User Avatar'}
+                                                className="w-10 h-10 rounded-full object-cover"
+                                            />
+                                            {/* <div className="flex-shrink-0 w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 text-lg font-semibold">
+                                                {post.user ? post.user.name.charAt(0).toUpperCase() : '?'}
+                                            </div> */}
+                                            <div>
+                                                <p className="text-sm font-semibold text-gray-900">{post.user ? post.user.name : 'User Anonim'}</p>
+                                                <p className="text-xs text-gray-500">{formatDate(post.created_at)}</p>
+                                            </div>
+                                        </div>
+
+                                        <h3 className="mb-2 text-xl font-bold text-gray-800 hover:text-blue-600">                                        
+                                            <Link href={route('post.show', post.id)}>
+                                                {post.name}
+                                            </Link>
+                                        </h3>
+
+                                        <p className="mb-4 text-sm leading-relaxed text-gray-700 line-clamp-3">{post.description}</p>
+                                        <div className="flex items-center justify-between text-sm text-gray-500">
+                                            <div className="flex items-center space-x-4">
+                                                <span className="flex items-center">
+                                                    <ThumbsUp className="w-4 h-4 mr-1" /> {post.likers_count}
+                                                </span>
+                                                <span className="flex items-center">
+                                                    <MessageSquare className="w-4 h-4 mr-1" /> {post.comments_count}
+                                                </span>
+                                            </div>
+                                            <Link
+                                                href={route('post.show', post.id)}
+                                                className="font-medium text-blue-600 hover:text-blue-700">
+                                                Lihat Selengkapnya
+                                            </Link>
+                                        </div>
+                                    </div>
+                                ))}
+                                <SimplePagination links={posts.links} /> {/* Paginasi untuk postingan */}
+                            </div>
+                        ) )
                     ) : (
                         <div className="p-8 mt-6 text-center bg-white border border-gray-200 rounded-lg shadow-sm">
                             <MessageSquare size={48} className="mx-auto mb-4 text-gray-400" />

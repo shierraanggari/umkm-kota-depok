@@ -107,12 +107,15 @@ class CommunityController extends Controller implements HasMiddleware
 
         $isAdmin = auth()->check() ? ((auth()->user() && auth()->id() === 1)) : false;
 
+        $isBanned = auth()->check() ? $community->bannedUsers()->where('user_id', auth()->id())->exists() : false;
+
         return inertia('Communities/Show', [
             'community' => $community,
             'posts' => $posts,
             'isMember' => $isMember,
             'isCreator' => $isCreator,
             'isAdmin' => $isAdmin,
+            'isBanned' => $isBanned,
             'auth_user_id' => auth()->id(),
         ]);
     }
