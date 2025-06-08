@@ -8,7 +8,8 @@ import {
     Factory,
     Ruler,
     ImageOff,
-    RotateCcw
+    RotateCcw,
+    Store
 } from 'lucide-react'
 import {
     Dialog,
@@ -343,9 +344,12 @@ export default function Index({ marketplaces, auth_user_id, kecamatans, keluraha
                         {marketplaces.links && <SimplePagination links={marketplaces.links} />}
                     </>
                 ) : (
-                    <div className="p-6 mt-4 text-center text-black">
-                        <p className="text-xl font-semibold">Belum ada lapak.</p>
-                        <p className="mt-2 text-sm">Saat ini belum ada lapak yang tersedia untuk ditampilkan.</p>
+                    <div className="p-10 mt-6 text-center bg-white border border-gray-300 rounded-lg shadow-sm">
+                        <Store size={48} className="mx-auto mb-4 text-gray-400" />
+                        <p className="text-xl font-semibold text-gray-700">Belum ada lapak.</p>
+                        <p className="mt-2 text-sm text-gray-500">
+                            Saat ini belum ada data lapak yang dapat ditampilkan.
+                        </p>
                     </div>
                 )}
             </div>

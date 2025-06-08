@@ -160,7 +160,7 @@ export default function Index({ communities, auth_user_id, filters: initialFilte
                                             )
                                         )}
                                     </div>
-                                    <p className="flex-grow mt-1 text-sm text-gray-700_leading-relaxed line-clamp-3">{community.description}</p> 
+                                    <p className="flex-grow mt-1 text-sm text-gray-700_leading-relaxed line-clamp-3 whitespace-pre-wrap">{community.description}</p> 
                                     <div className="flex items-center justify-between mt-4 text-xs text-gray-600">
                                         <span className="flex items-center">
                                             <MessageSquare className="w-3.5 h-3.5 mr-1.5 text-gray-500" />
