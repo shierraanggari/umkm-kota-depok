@@ -3,8 +3,10 @@ import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import hasAnyPermission from '@/Utils/Permission';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
@@ -15,6 +17,13 @@ export default function AuthenticatedLayout({ header, children }) {
     
     const { props } = usePage();
     const successMessage = props.flash?.success;
+    
+    useEffect(() => {
+        console.log("Flash props:", props.flash);
+        if (successMessage) {
+            toast.success(successMessage);
+        }
+    }, [successMessage]);
 
     const userPhotoUrl = user?.profile_photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&color=7F9CF5&background=EBF4FF`;
 
@@ -314,13 +323,17 @@ export default function AuthenticatedLayout({ header, children }) {
                 </header>
             )}
 
-            {successMessage && (
-                <div className="bg-green-100 text-green-800 p-3 rounded mx-2 mt-4 border border-green-300">
-                    {successMessage}
-                </div>
-            )}
-
-            <main>{children}</main>
+            <main>
+                <ToastContainer 
+                    position="top-right" 
+                    autoClose={3000} 
+                    hideProgressBar 
+                    toastClassName={() =>
+                        "flex items-center gap-1 bg-green-100 border border-green-500 text-green-800 rounded-lg shadow-md p-5 font-medium text-sm"
+                    }
+                />
+                {children}
+            </main>
         </div>
     );
 }

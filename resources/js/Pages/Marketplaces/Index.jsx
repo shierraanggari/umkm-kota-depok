@@ -1,4 +1,3 @@
-// import Layout from "../Layout/Layout";
 import { useState, useEffect } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Link, router, Head, usePage } from "@inertiajs/react";
@@ -59,6 +58,7 @@ export default function Index({ marketplaces, auth_user_id, kecamatans, keluraha
         if (marketplaceToDelete) {
             router.delete(route('marketplace.destroy', marketplaceToDelete.id), {
                 preserveScroll: true,
+                preserveState: false,
                 onSuccess: () => {
                     setIsDeleteDialogOpen(false);
                     setMarketplaceToDelete(null);                    
@@ -73,7 +73,6 @@ export default function Index({ marketplaces, auth_user_id, kecamatans, keluraha
         }
     };
 
-   // State untuk filter, diinisialisasi dengan nilai dari props atau default
     const [filters, setFilters] = useState({
         search: initialFiltersProp?.search || '',
         kecamatan: initialFiltersProp?.kecamatan || '',
@@ -85,7 +84,6 @@ export default function Index({ marketplaces, auth_user_id, kecamatans, keluraha
         maxSize: initialFiltersProp?.maxSize || '',
     });
 
-    // Update state filter lokal jika props filter dari controller berubah
     useEffect(() => {
         setFilters({
             search: initialFiltersProp?.search || '',
@@ -103,7 +101,6 @@ export default function Index({ marketplaces, auth_user_id, kecamatans, keluraha
         const { name, value } = e.target;
         setFilters(prevFilters => {
             const updatedFilters = { ...prevFilters, [name]: value };
-            // Jika kecamatan berubah, reset kelurahan
             if (name === 'kecamatan') {
                 updatedFilters.kelurahan = '';
             }
@@ -114,8 +111,8 @@ export default function Index({ marketplaces, auth_user_id, kecamatans, keluraha
     const applyFilters = () => {
         router.get(route('marketplace.index'), filters, {
             preserveScroll: true,
-            preserveState: true, // Agar input filter tidak hilang
-            replace: true // Agar tidak menambah history browser untuk setiap filter
+            preserveState: true,
+            replace: true
         });
     };
 

@@ -14,28 +14,25 @@ import { formatDistanceToNow, parseISO } from "date-fns";
 import { id as idLocale } from "date-fns/locale";
 
 const formatTimestamp = (dateString) => {
-    if (!dateString) return 'N/A'; // Handle jika dateString null atau undefined
+    if (!dateString) return 'N/A';
     try {
-        const date = parseISO(dateString); // parseISO untuk string tanggal ISO 8601 dari Laravel
+        const date = parseISO(dateString); 
         const now = new Date();
         
-        // Jika tanggal lebih dari 7 hari yang lalu, tampilkan format tanggal absolut
-        // Anda bisa sesuaikan batas ini (misalnya 24 jam, 3 hari, dll.)
-        if ((now.getTime() - date.getTime()) > 7 * 24 * 60 * 60 * 1000) { // Lebih dari 7 hari
+        if ((now.getTime() - date.getTime()) > 7 * 24 * 60 * 60 * 1000) {
             return new Intl.DateTimeFormat('id-ID', {
                 day: 'numeric', month: 'long', year: 'numeric',
                 hour: '2-digit', minute: '2-digit'
             }).format(date);
         }
-        // Jika kurang dari itu, tampilkan format relatif "X waktu yang lalu"
         return formatDistanceToNow(date, { addSuffix: true, locale: idLocale });
     } catch (error) {
         console.error("Error parsing date:", dateString, error);
-        return "Tanggal tidak valid"; // Fallback jika parsing gagal
+        return "Tanggal tidak valid";
     }
 };
 
-const CommentItem = ({ comment, currentUserId, onLikeComment, onDeleteComment /*, onEditComment */ }) => {
+const CommentItem = ({ comment, currentUserId, onLikeComment, onDeleteComment }) => {
     const canEditOrDelete = (currentUserId === comment.user_id || currentUserId === 1);
 
     return (

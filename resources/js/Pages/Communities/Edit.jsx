@@ -48,6 +48,7 @@ export default function Edit({ community, members, banned_users, auth_user_id })
         e.preventDefault();
         patch(route('community.update', community.id), {
             preserveScroll: true,
+            preserveState: false,
         });
     };
 
@@ -99,7 +100,7 @@ export default function Edit({ community, members, banned_users, auth_user_id })
                     <p className="mt-1 text-sm text-gray-600 mb-6">
                         Ubah nama dan deskripsi komunitas Anda.
                     </p>
-                    {recentlySuccessful && <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md text-sm">Perubahan berhasil disimpan!</div>}
+                    {/* {recentlySuccessful && <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-md text-sm">Perubahan berhasil disimpan!</div>} */}
                     <form onSubmit={submit} className="space-y-4">
                         <div>
                             <label htmlFor="name" className="block text-sm font-medium text-gray-700">Nama Komunitas<span className="text-red-500">*</span></label>
@@ -111,7 +112,7 @@ export default function Edit({ community, members, banned_users, auth_user_id })
                                 className={`mt-1 w-full border rounded-md p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500 ${errors.name ? 'border-red-500' : 'border-gray-300'}`}
                             />
                             {/* {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>} */}
-                            {( data.name !== community.name ) && errors.name && (
+                            { errors.name && (
                                 <p className="text-xs text-red-500 mt-1">{errors.name}</p>
                             )}
                         </div>

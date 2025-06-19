@@ -142,14 +142,15 @@ class UserController extends Controller implements HasMiddleware
         $user = auth()->user();
 
         $bookmarkedPosts = $user->bookmarkedPosts()
-            ->with(['user:id,name', 'community:id,name'])
-            ->withCount(['comments', 'likers'])
-            ->latest('bookmark_post.created_at')
-            ->paginate(10);
-
+        ->with(['user:id,name', 'community:id,name'])
+        ->withCount(['comments', 'likers'])
+        ->latest('bookmark_post.created_at')
+        ->paginate(10);
+        
         return inertia('Profile/BookmarkedPosts', [
             'posts' => $bookmarkedPosts,
         ]);
+
     }
 
     public function myPosts()
@@ -157,7 +158,7 @@ class UserController extends Controller implements HasMiddleware
         $user = auth()->user();
         
         $myPosts = $user->posts()
-            ->with('community:id,name') 
+            ->with(['user:id,name', 'community:id,name'])
             ->withCount(['comments', 'likers'])
             ->latest()
             ->paginate(10);

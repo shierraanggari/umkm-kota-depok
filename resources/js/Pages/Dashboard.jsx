@@ -3,7 +3,6 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { Button } from '@/Components/ui/button';
 import { ShoppingBag, MessageSquareText, Users, ArrowRight, ImageOff, ThumbsUp, MessageCircle, Factory } from 'lucide-react';
 
-// Komponen Card untuk Marketplace Sederhana
 const MarketplaceCard = ({ marketplace }) => {
     return (
         <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
@@ -27,7 +26,6 @@ const MarketplaceCard = ({ marketplace }) => {
     );
 };
 
-// Komponen Card untuk Postingan Sederhana
 const PostCard = ({ post }) => {
     return (
         <div className="bg-white rounded-lg shadow-md p-4 hover:shadow-xl transition-shadow duration-300">
@@ -82,7 +80,6 @@ export default function Dashboard({ auth, latestMarketplaces, feedPosts, hasJoin
             <div className="py-8 px-4">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
                     
-                    {/* Welcome Message */}
                     <div className="bg-white overflow-hidden shadow-sm rounded-lg">
                         <div className="p-6 text-gray-900">
                             <h3 className="text-2xl font-semibold">Selamat Datang Kembali, {user.name}!</h3>
@@ -90,7 +87,6 @@ export default function Dashboard({ auth, latestMarketplaces, feedPosts, hasJoin
                         </div>
                     </div>
 
-                    {/* Section Lapak Terbaru */}
                     <section>
                         <div className="flex flex-col sm:flex-row lg:justify-between lg:items-center mb-4">
                             <h3 className="text-xl font-semibold text-gray-700 flex">
@@ -114,7 +110,6 @@ export default function Dashboard({ auth, latestMarketplaces, feedPosts, hasJoin
                         )}
                     </section>
 
-                    {/* Section Postingan Terbaru dari Komunitas */}
                     <section>
                         <div className="flex flex-col sm:flex-row lg:justify-between lg:items-center mb-4">
                             <h3 className="text-xl font-semibold text-gray-700 flex">
