@@ -26,12 +26,10 @@ export default function Index() {
             <Head title="Selamat Datang di Platform UMKM Kota Depok" />
             {/* <div className="min-h-screen bg-gradient-to-br from-indigo-100 via-purple-50 to-pink-50 text-gray-800 font-inter"> */}
                 
-                {/* Hero Section */}
+                {/* Section 1 */}
                 <header className="bg-indigo-700 relative pt-28 pb-20 md:pt-40 md:pb-28 text-center overflow-hidden">
                     <div className="absolute inset-0 hero-gradient opacity-80 transform -skew-y-3 z-0"></div>
                     <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
-                        {/* Anda bisa menambahkan logo di sini jika mau */}
-                        {/* <img src="/path/to/your/logo.svg" alt="Logo UMKM Depok" className="h-16 mx-auto mb-8" /> */}
                         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-white">
                             Platform Kolaborasi <span className="block text-indigo-200">UMKM Kota Depok</span>
                         </h1>
@@ -40,16 +38,21 @@ export default function Index() {
                         </p>
                         <div className="mt-12">
                             <Link
-                                href={route('register')}
+                                href={route('login')}
                                 className="inline-block bg-white text-indigo-700 px-10 py-4 rounded-lg text-lg font-bold shadow-xl hover:bg-indigo-50 transition duration-300 ease-in-out transform hover:scale-105 cta-button"
                             >
-                                Mulai Sekarang, Gratis!
+                                Log In
+                            </Link>
+                            <Link
+                                href={route('register')}
+                                className="inline-block ml-3 bg-white text-indigo-700 px-10 py-4 rounded-lg text-lg font-bold shadow-xl hover:bg-indigo-50 transition duration-300 ease-in-out transform hover:scale-105 cta-button"
+                            >
+                                Register
                             </Link>
                         </div>
                     </div>
                 </header>
 
-                {/* Fitur Unggulan dengan Gambar */}
                 <section id="fitur" className="py-16 sm:py-24 bg-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="text-center mb-14">
@@ -61,7 +64,6 @@ export default function Index() {
                             </p>
                         </div>
 
-                        {/* Fitur 1: Cari Lapak */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16 lg:mb-24">
                             <div className="order-2 lg:order-1">
                                 <div className="inline-flex items-center bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-medium mb-3">
@@ -84,7 +86,6 @@ export default function Index() {
                             </div>
                         </div>
 
-                        {/* Fitur 2: Forum Diskusi */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                             <div className="order-2">
                                 <div className="inline-flex items-center bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm font-medium mb-3">
@@ -109,35 +110,6 @@ export default function Index() {
                     </div>
                 </section>
                 
-                {/* Fitur Tambahan */}
-                {/* <section className="py-16 sm:py-24 bg-gray-50">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                            <div>
-                                <div className="inline-flex items-center bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium mb-3">
-                                    <Users size={18} className="mr-2" /> Jaringan & Peluang
-                                </div>
-                                <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Bangun Jaringan, Perluas Peluang</h3>
-                                <p className="text-gray-600 leading-relaxed mb-6">
-                                   Manfaatkan platform kami untuk membangun koneksi bisnis yang berharga, menemukan mitra potensial, dan mendapatkan informasi terbaru mengenai pelatihan, pendanaan, serta program dukungan UMKM dari Pemerintah Kota Depok.
-                                </p>
-                                <Link href={route('register')} className="inline-flex items-center text-green-600 font-semibold hover:text-green-800 transition-colors">
-                                    Daftar dan Mulai Berjejaring <ArrowRight size={20} className="ml-2" />
-                                </Link>
-                            </div>
-                            <div>
-                                <img 
-                                    src={placeholderJaringan} 
-                                    alt="Ilustrasi jaringan UMKM Depok" 
-                                    className="rounded-xl shadow-2xl w-full h-auto object-cover aspect-video" 
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </section> */}
-
-
-                {/* Call to Action Section */}
                 <section className="bg-indigo-700 hero-gradient py-16 sm:py-20">
                     <div className="max-w-3xl mx-auto text-center px-4 sm:px-6 lg:px-8">
                         <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
@@ -155,15 +127,9 @@ export default function Index() {
                     </div>
                 </section>
 
-                {/* Footer */}
                 <footer className="bg-gray-800 text-gray-400 border-t border-gray-700">
                     <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8 text-center">
                         <p className="text-sm">&copy; {new Date().getFullYear()} Platform UMKM Kota Depok. Semua Hak Cipta Dilindungi.</p>
-                        {/* <div className="mt-4 space-x-5">
-                            <Link href="#" className="hover:text-indigo-300 text-xs">Tentang Kami</Link>
-                            <Link href="#" className="hover:text-indigo-300 text-xs">Kontak</Link>
-                            <Link href="#" className="hover:text-indigo-300 text-xs">Kebijakan Privasi</Link>
-                        </div> */}
                     </div>
                 </footer>
             {/* </div> */}

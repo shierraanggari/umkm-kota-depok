@@ -4,7 +4,8 @@
     "scripts": {
         "dev": "vite",
         "serve": "php artisan serve",
-        "start": "concurrently \"npm run dev\" \"npm run serve\""
+        "start": "concurrently \"npm run dev\" \"npm run serve\"",
+        "build": "vite build"
     },
     "devDependencies": {
         "@headlessui/react": "^2.0.0",
@@ -35,6 +36,7 @@
         "react": "^19.1.0",
         "react-dom": "^19.1.0",
         "react-select": "^5.10.1",
+        "react-toastify": "^11.0.5",
         "sweetalert2": "^11.21.2",
         "tailwind-merge": "^3.3.0",
         "tailwindcss-animate": "^1.0.7"

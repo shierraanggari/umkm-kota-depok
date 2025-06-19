@@ -1,11 +1,11 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
-import { Button } from "@/Components/ui/button"; // Asumsi Anda punya komponen Button ini
+import { Button } from "@/Components/ui/button"; 
 import { useForm, Head } from "@inertiajs/react";
-import { useState, useEffect } from "react"; // Impor useEffect
+import { useState, useEffect } from "react";
 
-export default function Edit({ marketplace, types, kelurahans, kecamatans, auth }) { // Tambahkan auth jika diperlukan AuthenticatedLayout
-    const { data, setData, post, processing, errors, reset } = useForm({ // Mengganti put dengan post untuk file, atau gunakan helper Inertia.post
-        _method: 'PUT', // Untuk Laravel agar mengenali ini sebagai PUT request saat mengirim FormData
+export default function Edit({ marketplace, types, kelurahans, kecamatans, auth }) { 
+    const { data, setData, post, processing, errors, reset } = useForm({ 
+        _method: 'PUT', 
         name: marketplace.name || '',
         type: marketplace.type || '',
         description: marketplace.description || '',
@@ -20,37 +20,30 @@ export default function Edit({ marketplace, types, kelurahans, kecamatans, auth 
         long: marketplace.long || '',
         lat: marketplace.lat || '',
         status: marketplace.status || 'available',
-        photos: [], // Untuk file baru yang akan diupload
-        deleted_photos: [], // Untuk ID foto lama yang akan dihapus
+        photos: [], 
+        deleted_photos: [], 
     });
 
     const [locationError, setLocationError] = useState(null);
     const availableKelurahans = data.kecamatan && kelurahans[data.kecamatan] ? kelurahans[data.kecamatan] : [];
-
-    // Menghitung jumlah foto yang akan ditampilkan/disimpan
+    
     const existingPhotosToShow = marketplace.photos ? marketplace.photos.filter(photo => !data.deleted_photos.includes(photo.id)) : [];
     const totalPhotosCount = existingPhotosToShow.length + data.photos.length;
 
     const handleKecamatanChange = (e) => {
-        setData(prevData => ({ // Gunakan callback untuk memastikan state terbaru
+        setData(prevData => ({ 
             ...prevData,
             kecamatan: e.target.value,
-            kelurahan: '', // Reset kelurahan saat kecamatan berubah
+            kelurahan: '', 
         }));
     };
 
     const submit = (e) => {
         e.preventDefault();
-        // Inertia's `post` method is generally preferred for multipart/form-data,
-        // even for PUT/PATCH, by including a `_method` field.
-        // If `put` from `useForm` handles FileObjects correctly, you can use that.
-        // Let's assume `post` with `_method: 'PUT'` for clarity with file uploads.
         post(route('marketplace.update', marketplace.id), {
             onError: () => {
-                // Mungkin ada error handling spesifik di sini jika diperlukan
             },
             onSuccess: () => {
-                // Mungkin reset form atau redirect
             }
         });
     };
@@ -60,7 +53,7 @@ export default function Edit({ marketplace, types, kelurahans, kecamatans, auth 
             setLocationError(null);
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    setData(prevData => ({ // Gunakan callback
+                    setData(prevData => ({
                         ...prevData,
                         lat: position.coords.latitude,
                         long: position.coords.longitude,
@@ -80,7 +73,7 @@ export default function Edit({ marketplace, types, kelurahans, kecamatans, auth 
     const handleMultipleFiles = (e) => {
         const newFiles = Array.from(e.target.files);
         const validFiles = newFiles.filter(f =>
-            ['image/jpeg', 'image/png', 'image/jpg', 'image/heif', 'image/webp'].includes(f.type) // Tambahkan HEIF/WEBP jika didukung
+            ['image/jpeg', 'image/png', 'image/jpg', 'image/heif', 'image/webp'].includes(f.type) 
         );
 
         if (newFiles.length !== validFiles.length) {
@@ -94,22 +87,21 @@ export default function Edit({ marketplace, types, kelurahans, kecamatans, auth 
 
         if (currentExistingPhotosCount + currentNewPhotosCount + validFiles.length > 5) {
             alert(`Maksimal 5 foto. Anda sudah memiliki ${currentExistingPhotosCount} foto lama dan ${currentNewPhotosCount} foto baru terpilih. Anda hanya bisa menambah ${5 - (currentExistingPhotosCount + currentNewPhotosCount)} foto lagi.`);
-            // Kosongkan input file agar pengguna bisa memilih ulang jika mau
+            
             e.target.value = null;
             return;
         }
         setData('photos', [...data.photos, ...validFiles]);
-        // Kosongkan input file agar pengguna bisa memilih file yang berbeda lagi di input yang sama
+        
         e.target.value = null;
     };
 
-    const handleFileRemove = (index) => { // Untuk menghapus file BARU yang dipilih
+    const handleFileRemove = (index) => { 
         setData('photos', data.photos.filter((_, i) => i !== index));
     };
 
-    const handleDeleteExistingPhoto = (mediaId) => { // Untuk menandai foto LAMA agar dihapus
-        if (data.deleted_photos.includes(mediaId)) {
-            // Batalkan penghapusan jika sudah ditandai (opsional, bisa juga tidak ada fitur ini)
+    const handleDeleteExistingPhoto = (mediaId) => { 
+        if (data.deleted_photos.includes(mediaId)) {            
             setData('deleted_photos', data.deleted_photos.filter(id => id !== mediaId));
         } else {
             setData('deleted_photos', [...data.deleted_photos, mediaId]);
@@ -435,7 +427,9 @@ export default function Edit({ marketplace, types, kelurahans, kecamatans, auth 
                                 />
                                 {totalPhotosCount >= 5 && <p className="mt-1 text-sm text-yellow-600">Anda sudah mencapai batas maksimal 5 foto.</p>}
                                 {errors.photos && <span className="text-red-500">{errors.photos}</span>}
-                                {Array.isArray(errors) && errors.find(e => e.startsWith('photos.')) && <span className="text-red-500">Terdapat masalah dengan salah satu file foto.</span>}
+                                {typeof errors === 'object' && Object.keys(errors).some(key => key.startsWith('photos.')) && (
+                                    <span className="text-sm text-red-500">Terdapat masalah unggah foto. Pastikan format file adalah JPEG, JPG, PNG, HEIF, atau WEBP, serta ukuran file di bawah 2 MB.</span>
+                                )}
 
                             </div>
                             

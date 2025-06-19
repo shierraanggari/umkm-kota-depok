@@ -306,7 +306,7 @@ export default function Show({ marketplace, photos, auth_user_id, recommended_ma
                 Lokasi di Peta
             </div>
             {hasValidLocation ? (
-              <div className="w-full overflow-hidden rounded-lg h-80 md:h-96"> {/* Memberi tinggi pada container iframe */}
+              <div className="w-full overflow-hidden rounded-lg h-80 md:h-96">
                   <iframe
                       loading="lazy"
                       allowFullScreen
@@ -323,7 +323,6 @@ export default function Show({ marketplace, photos, auth_user_id, recommended_ma
           {recommended_marketplaces && recommended_marketplaces.length > 0 && (
             <div className="mt-10 pt-6 border-t border-gray-200">
               <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
-                {/* <ThumbsUp className="w-5 h-5 mr-2 text-blue-600" /> Jika Anda menggunakan lucide-react */}
                 <span>Lapak Lain yang Mungkin Anda Suka</span>
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

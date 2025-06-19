@@ -67,10 +67,10 @@ export default function Create({ types, kelurahans, kecamatans }) {
     const handleMultipleFiles = (e) => {
         const newFiles = Array.from(e.target.files);
         const validFiles = newFiles.filter(f => 
-            ['image/jpeg', 'image/png', 'image/jpg', 'image/heif'].includes(f.type)
+            ['image/jpeg', 'image/png', 'image/jpg', 'image/heif', 'image/webp'].includes(f.type)
         );
         if (newFiles.length !== validFiles.length) {
-            alert('Masukkan file dengan format JPG, JPEG, PNG, atau HEIF.');
+            alert('Masukkan file dengan format JPG, JPEG, PNG, HEIF, atau WEBP.');
         }
         const totalFiles = data.photos.length + validFiles.length;
         if (totalFiles > 5) {
@@ -387,23 +387,18 @@ export default function Create({ types, kelurahans, kecamatans }) {
                                 type="file"
                                 multiple
                                 onChange={handleMultipleFiles}
-                                accept="image/jpeg,image/png,image/jpg,image/heif,image/webp" // Tambah webp
+                                accept="image/jpeg,image/png,image/jpg,image/heif,image/webp"
                                 className="w-full p-6 text-sm border-2 border-dashed rounded-md disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                disabled={data.photos.length >= 5} // Disable jika sudah 5 foto
+                                disabled={data.photos.length >= 5}
                             />
                             {data.photos.length >= 5 && (
                                 <p className="mt-1 text-sm text-yellow-600">Anda sudah mencapai batas maksimal 5 foto.</p>
                             )}
-                            {/* Menampilkan error umum untuk field photos (misal dari validasi backend) */}
-                            {errors.photos && typeof errors.photos === 'string' && (
-                                <span className="text-sm text-red-500">{errors.photos}</span>
-                            )}
-                            {/* Menampilkan error spesifik per file jika ada (misal: photos.0 tidak valid) */}
+                            {errors.photos && <span className="text-red-500">{errors.photos}</span>}
                             {typeof errors === 'object' && Object.keys(errors).some(key => key.startsWith('photos.')) && (
-                                 <span className="text-sm text-red-500">Terdapat masalah dengan salah satu atau lebih file foto yang diupload. Pastikan format dan ukuran sesuai.</span>
+                                <span className="text-sm text-red-500">Terdapat masalah unggah foto. Pastikan format file adalah JPEG, JPG, PNG, HEIF, atau WEBP, serta ukuran file di bawah 2 MB.</span>
                             )}
-
-
+                            
                             {data.photos.length > 0 && (
                                 <div className="mt-4">
                                     <p className="mb-2 text-sm font-semibold">Preview foto yang dipilih ({data.photos.length}/5):</p>
@@ -414,12 +409,12 @@ export default function Create({ types, kelurahans, kecamatans }) {
                                                     src={URL.createObjectURL(file)}
                                                     alt={`Preview ${file.name}`}
                                                     className="object-cover rounded-md w-28 h-28"
-                                                    onLoad={() => URL.revokeObjectURL(file.previewUrl)} // Bersihkan memory
+                                                    onLoad={() => URL.revokeObjectURL(file.previewUrl)}
                                                 />
                                                 <Button
                                                     type="button"
                                                     onClick={() => handleFileRemove(index)}
-                                                    variant="destructive" // Jika Button component Anda punya variant
+                                                    variant="destructive"
                                                     className="absolute top-1 right-1 flex items-center justify-center w-6 h-6 p-0 text-xs text-white bg-red-500 rounded-full opacity-75 group-hover:opacity-100 hover:bg-red-700"
                                                     title="Hapus foto ini"
                                                 >

@@ -76,7 +76,7 @@ export default function MyMarketplaces({ auth, marketplaces }) { // Menerima aut
     
     return (
         <AuthenticatedLayout
-            user={auth.user} // Menggunakan auth.user dari props
+            user={auth.user}
             header={
                 <h2 className="text-xl font-semibold leading-tight text-gray-800">
                     Lapak Saya
@@ -86,26 +86,21 @@ export default function MyMarketplaces({ auth, marketplaces }) { // Menerima aut
             <Head title="Lapak Saya" />
 
             <div className="mx-2 my-6 space-y-6">
-                {/* Bagian Filter tidak relevan di sini, bisa dihilangkan atau disederhanakan jika perlu */}
-                {/* Saya akan hilangkan bagian filter untuk halaman "Lapak Saya" */}
-
                 <div className="flex flex-row items-center justify-between gap-3">
                     <h2 className="text-xl font-semibold leading-tight text-gray-800"> Daftar Lapak Milik Anda </h2>
                     <Link href={route('marketplace.create')}>
-                        <Button className="flex items-center"> {/* Menggunakan Button dari ui */}
+                        <Button className="flex items-center">
                             <PlusCircle size={18} className="mr-2" />
                             Tambah Lapak 
                         </Button>
                     </Link>
                 </div>
 
-                {/* Menggunakan marketplaces.data karena ini adalah objek paginasi */}
                 {marketplaces && marketplaces.data && marketplaces.data.length > 0 ? (
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {marketplaces.data.map((item) => ( // Menggunakan item.id sebagai key
+                        {marketplaces.data.map((item) => ( 
                             <div key={item.id} className="flex flex-col overflow-hidden bg-white border border-gray-300 rounded-lg shadow-sm">
-                                <div className="flex items-center justify-center w-full h-48 bg-gray-200 rounded-t-lg"> {/* rounded-t-lg jika gambar di atas */}
-                                    {/* Menggunakan item.photo_url sesuai contoh controller saya sebelumnya atau item.photo jika itu nama propnya */}
+                                <div className="flex items-center justify-center w-full h-48 bg-gray-200 rounded-t-lg">
                                     {item.photo_url ? ( 
                                         <img src={item.photo_url} alt={item.name} className="object-cover w-full h-full" />
                                     ) : (
@@ -115,20 +110,19 @@ export default function MyMarketplaces({ auth, marketplaces }) { // Menerima aut
                                         </div>
                                     )}
                                 </div>
-                                <div className="p-4 space-y-2"> {/* Struktur dari Index.jsx Anda */}
-                                    <p className="text-lg font-semibold text-gray-900 truncate">{item.name}</p> {/* Style disamakan */}
-                                    <p className="text-xl font-bold"> {/* Style disamakan */}
+                                <div className="p-4 space-y-2">
+                                    <p className="text-lg font-semibold text-gray-900 truncate">{item.name}</p>
+                                    <p className="text-xl font-bold">
                                         {item.price}
                                         <span className="text-sm font-normal text-gray-500">
                                             {item.price_type === 'monthly' ? '/bulan' : '/tahun'}
                                         </span>
                                     </p>
-                                    {/* Jika item.location ada, atau ganti dengan item.address */}
-                                    {/* <p className="text-sm text-gray-400 mb-2">{item.address || 'Alamat tidak tersedia'}</p> */}
-                                    <p className="flex items-center text-sm text-gray-600"> {/* Style disamakan */}
+                                    
+                                    <p className="flex items-center text-sm text-gray-600">
                                         <MapPin className="w-4 h-4 mr-1.5 text-gray-500"/>{item.kelurahan_label || item.kelurahan}, {item.kecamatan_label || item.kecamatan}
                                     </p>
-                                    <div className="flex flex-wrap justify-between pt-1 text-xs text-gray-500"> {/* Style disamakan */}
+                                    <div className="flex flex-wrap justify-between pt-1 text-xs text-gray-500">
                                         <span className="flex items-center mb-1 mr-2"><Factory className="w-4 h-4 mr-1 text-gray-500"/>{item.type_label || item.type}</span>
                                         <span className="flex items-center mb-1"><Ruler className="w-4 h-4 mr-1 text-gray-500"/>{item.size_length && item.size_width ? `${+item.size_length} x ${+item.size_width} m` : 'N/A'}</span>
                                     </div>
@@ -160,7 +154,7 @@ export default function MyMarketplaces({ auth, marketplaces }) { // Menerima aut
                         ))}
                     </div>
                 ) : (
-                    <div className="p-6 mt-4 text-center text-gray-600 bg-white border border-gray-300 rounded-lg shadow"> {/* Style disamakan */}
+                    <div className="p-6 mt-4 text-center text-gray-600 bg-white border border-gray-300 rounded-lg shadow">
                         <p className="text-xl font-semibold">Anda belum memiliki lapak.</p>
                         <p className="mt-2 text-sm">Silakan tambahkan lapak baru untuk ditampilkan di sini.</p>
                         <Link href={route('marketplace.create')} className="mt-4 inline-block">
@@ -171,13 +165,12 @@ export default function MyMarketplaces({ auth, marketplaces }) { // Menerima aut
                         </Link>
                     </div>
                 )}
-                {/* Paginasi jika ada data */}
+                
                 {marketplaces && marketplaces.data && marketplaces.data.length > 0 && marketplaces.links && (
                     <SimplePagination links={marketplaces.links} />
                 )}
             </div>
-
-            {/* Dialog Konfirmasi Hapus */}
+            
             <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                 <DialogContent>
                     <DialogHeader>

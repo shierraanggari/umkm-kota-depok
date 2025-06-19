@@ -152,7 +152,7 @@ class MarketplaceController extends Controller implements HasMiddleware
             'long' => 'nullable|numeric',
             'lat' => 'nullable|numeric',
             'status' => 'required|in:available,unavailable',
-            'photos.*' => 'nullable|image|mimes:jpeg,png,jpg,heif|max:2048',
+            'photos.*' => 'nullable|image|mimes:jpeg,png,jpg,heif,webp|max:2048',
         ]);
 
         $nomorInput = $validated['phone_number'];
@@ -172,10 +172,8 @@ class MarketplaceController extends Controller implements HasMiddleware
                 $marketplace->addMedia($photo)->toMediaCollection('photos');
             }
         }
-
-        session()->flash('success', 'Lapak berhasil dibuat.');
-
-        return redirect()->route('marketplace.index');
+        
+        return redirect()->route('marketplace.index')->with('success', 'Lapak berhasil dibuat.');
     }
 
     /**
@@ -220,6 +218,7 @@ class MarketplaceController extends Controller implements HasMiddleware
         ];
 
         $allOtherMarketplacesFromDB = Marketplace::where('id', '!=', $marketplace->id)
+            ->where('status', 'available')
             ->select(['id', 'name', 'description', 'type', 'kecamatan', 'kelurahan', 'price'])
             // ->take(50)
             ->get();
@@ -401,9 +400,11 @@ class MarketplaceController extends Controller implements HasMiddleware
             'long' => 'nullable|numeric',
             'lat' => 'nullable|numeric',
             'status' => 'required|in:available,unavailable',    
-            'photos.*' => 'nullable|image|mimes:jpeg,png,jpg,heif|max:2048',
+            'photos.*' => 'nullable|image|mimes:jpeg,png,jpg,heif,webp|max:2048',
             'deleted_photos.*' => 'nullable|integer|exists:media,id'
         ]);
+
+        \Log::info('Validated photos:', $validated['photos.*'] ?? []);
         
         if (!empty($validated['deleted_photos'])) {
             foreach ($validated['deleted_photos'] as $mediaId) {
@@ -438,10 +439,8 @@ class MarketplaceController extends Controller implements HasMiddleware
                 $marketplace->addMedia($photo)->toMediaCollection('photos');
             }
         }
-
-        session()->flash('success', 'Lapak berhasil diperbarui.');
-
-        return redirect()->route('marketplace.index');
+        
+        return redirect()->route('marketplace.index')->with('success', 'Lapak berhasil diperbarui.');
     }
 
     /**

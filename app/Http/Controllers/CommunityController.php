@@ -147,7 +147,7 @@ class CommunityController extends Controller implements HasMiddleware
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:communities',
+            'name' => 'required|string|max:255|unique:communities,name,' . $community->id,
             'description' => 'required|string|max:1000',
         ]);
 
@@ -167,13 +167,13 @@ class CommunityController extends Controller implements HasMiddleware
 
     public function join(Community $community)
     {
-        if ($community->members()->where('user_id', auth()->id())->exists()) {
-            return back()->with('warning', 'Anda sudah menjadi anggota komunitas ini.');
-        }
+        // if ($community->members()->where('user_id', auth()->id())->exists()) {
+        //     return back()->with('warning', 'Anda sudah menjadi anggota komunitas ini.');
+        // }
 
-        if ($community->bannedUsers()->where('user_id', auth()->id())->exists()) {
-            return back()->with('error', 'Anda tidak dapat bergabung karena telah diban dari komunitas ini.');
-        }
+        // if ($community->bannedUsers()->where('user_id', auth()->id())->exists()) {
+        //     return back()->with('error', 'Anda tidak dapat bergabung karena telah diban dari komunitas ini.');
+        // }
 
         $community->members()->attach(auth()->id(), ['created_at' => now(), 'updated_at' => now()]);
         return back()->with('success', 'Anda berhasil bergabung dengan komunitas ' . $community->name);
@@ -181,13 +181,13 @@ class CommunityController extends Controller implements HasMiddleware
 
     public function leave(Community $community)
     {
-        if (!auth()->check() || !$community->members()->where('user_id', auth()->id())->exists()) {
-            return back()->with('warning', 'Anda bukan anggota komunitas ini.');
-        }
+        // if (!auth()->check() || !$community->members()->where('user_id', auth()->id())->exists()) {
+        //     return back()->with('warning', 'Anda bukan anggota komunitas ini.');
+        // }
 
-        if ($community->creator_id === auth()->id()) {
-             return back()->with('error', 'Sebagai pembuat, Anda tidak dapat meninggalkan komunitas ini. Anda dapat menghapusnya.');
-        }
+        // if ($community->creator_id === auth()->id()) {
+        //      return back()->with('error', 'Sebagai pembuat, Anda tidak dapat meninggalkan komunitas ini. Anda dapat menghapusnya.');
+        // }
 
         $community->members()->detach(auth()->id());
         return back()->with('success', 'Anda berhasil keluar dari komunitas ' . $community->name);
@@ -199,9 +199,9 @@ class CommunityController extends Controller implements HasMiddleware
             abort(403, 'Anda tidak memiliki izin untuk melakukan tindakan ini.');
         }
 
-        if ($userToBan->id === auth()->id() || $userToBan->id === $community->creator_id || ($userToBan->id === 1 && auth()->id() !== 1) ) {
-             return back()->with('error', 'Tidak dapat mem-ban pengguna ini.');
-        }
+        // if ($userToBan->id === auth()->id() || $userToBan->id === $community->creator_id || ($userToBan->id === 1 && auth()->id() !== 1) ) {
+        //      return back()->with('error', 'Tidak dapat mem-ban pengguna ini.');
+        // }
 
         $community->members()->detach($userToBan->id);
 
