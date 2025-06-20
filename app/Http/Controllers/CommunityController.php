@@ -66,6 +66,10 @@ class CommunityController extends Controller implements HasMiddleware
 
     public function create()
     {
+        if (auth()->id() !== 1) {
+            abort(403, 'Anda tidak memiliki izin untuk membuat komunitas.');
+        }
+
         return inertia('Communities/Create');
     }
 

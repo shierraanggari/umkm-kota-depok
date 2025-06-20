@@ -111,7 +111,7 @@ export default function Index({ marketplaces, auth_user_id, kecamatans, keluraha
     const applyFilters = () => {
         router.get(route('marketplace.index'), filters, {
             preserveScroll: true,
-            preserveState: true,
+            // preserveState: true,
             replace: true
         });
     };
@@ -123,7 +123,7 @@ export default function Index({ marketplaces, auth_user_id, kecamatans, keluraha
         setFilters(defaultFilters);
         router.get(route('marketplace.index'), defaultFilters, {
             preserveScroll: true,
-            preserveState: true,
+            // preserveState: true,
             replace: true
         });
     };
